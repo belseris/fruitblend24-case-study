@@ -50,8 +50,25 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - `rate_code_dim`: base_code, rate_code_name, discount_pct, code_pattern, conditions (อ่าน conditions ก่อนตัดสินว่าโค้ดไหนคือราคาปกติ)
 - `platform_dim`: platform_code, platform_name
 - `sku_code_dim`: sku_code, sku (ใช้กับโค้ด RC101 เท่านั้น)
-- `cost_assumptions`: ต้นทุนแพ็กเกจ/แรงงานต่อแก้วต่อ SKU + overhead คงที่รายเดือนต่อครัว (ชื่อคอลัมน์ต้องเช็กจากไฟล์จริง)
+- `cost_assumptions`: 2 ตารางในชีตเดียว (ต้นทุนต่อแก้ว + overhead ครัว) แยกแล้วใน `load_tables()` เป็น `unit_cost` และ `kitchen_overhead`
 - `monthly_budget`: month, budget_revenue_thb, budget_gross_profit_thb, note (อ่าน note ก่อนนิยาม GP)
+
+## ชื่อจริงในโค้ดของโปรเจกต์ (ใช้ชื่อนี้ ไม่ใช่ชื่อในบทเรียน)
+- `src/load_clean.py`: SKUS, BERRY, BERRY_LAUNCH, KEY, week_monday(), load_raw(), load_mapping(), load_tables(raw=None, return_log=False), clean_orders(raw=None, mapping=None), reconcile(raw_orders, clean, log), load_clean()
+- `load_tables()` keys: rate_code_dim, platform_dim, sku_code_dim, platform_commission_rate, unit_cost (มี pack_labor_per_cup_thb, base_price_thb), kitchen_overhead (fixed_monthly_overhead_thb), monthly_budget (month เป็น datetime), weekly_fruit_cost (มี is_filled), waste_daily (มี is_filled)
+- clean orders columns: date, hour, day_of_week, kitchen, item_name_raw, sku, rate_code, platform_code (LM/GB), base_code, sku_code, price_thb, units_sold, gross_revenue_thb, flag_unknown_code, flag_rc101_mismatch — ไม่มีคอลัมน์ month ต้องสร้างเอง
+- `src/economics.py`: enrich(df, sheets) เพิ่ม week_start, commission_rate, discount_pct, fruit_cost_per_cup_thb, pack_labor_per_cup_thb, base_price_thb, list_price_thb, list_revenue_thb, discount_thb, commission_thb, net_revenue_thb, fruit_cost_thb, pack_labor_thb, cm_thb · unit_economics(e, by) คืน cups, list_price, avg_sell_price, cm_per_cup, cm_pct ฯลฯ
+- CM ที่ราคาเต็มต่อแก้ว = list_price_thb × (1 − commission_rate) − fruit_cost_per_cup_thb − pack_labor_per_cup_thb
+
+## ข้อเท็จจริงที่ยืนยันแล้ว (notebook 01-02, decisions.md)
+- หลัง clean: 123,655 แถว, 618,123 แก้ว, revenue 31,146,932.57 THB; ไม่มีแถว same-key
+- Rate codes: RC000 ราคาปกติ 0% · RC101 Bundle 15% (1 SKU, สุ่ม ~1 ใน 10 วัน, ครอบคลุมทั้งวัน, 3-8 วันต่อเมนู) · RC102 Double Day 20% (12 วัน, 5 วันเป็นวันอังคาร) · RC103 Seasonal 12% (หน้าฝน: ก.ย.-ต.ค. 2025, มิ.ย.-ส.ค. 2026)
+- Commission LM 0.30, GB 0.24; LM มี 56% ของ revenue ทุกครัวและทุกชั่วโมง
+- พีค: พัทยา 22:00, กรุงเทพ 12:00; ส-อา 22:00 สูงสุด; ช่วงเงียบ = Morning 6-10 และ Late night 22-5 (~40 แก้ว/ชม. vs ~100-110)
+- ฤดู: เมนูเดิมพีคเมษายน (สัปดาห์สงกรานต์ 13 เม.ย. สูงผิดปกติ), ต่ำสุดหน้าฝน
+- Berry: CM 10.02/แก้ว, waste 20.5%, CM หลัง waste −1.92/แก้ว; ยอดลด 67% ตั้งแต่เปิดตัว
+- Elasticity หลัก (RC101 vs RC000): −1.1 (berry) ถึง −1.8 (Guava); day-level −1.5 ถึง −2.1
+- การตัดสินราคาบทที่ 6 อยู่ใน decisions.md (Watermelon 49, PassionFruit 69, Pineapple/Guava test 55, Berry fix cost/review delist, platform price test only)
 
 ## ปัญหาข้อมูลที่รู้แล้ว
 - `item_name_raw` สะกด/ภาษา/ตัวพิมพ์ไม่สม่ำเสมอ มีสินค้าที่ไม่ใช่เมนู และมีแถวซ้ำแบบ exact
@@ -74,7 +91,8 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - ค่าเฉลี่ยต่อแก้ว: รวมเงินก่อนแล้วหารด้วยจำนวนแก้ว (weighted) ห้ามเฉลี่ยต่อแถว
 - Discount cost = (ราคาเต็ม − price_thb) × units_sold
 - Break-even lift = CM_full / CM_promo − 1 (ถ้า CM_promo ≤ 0 = Kill)
-- Baseline โปร = แก้วเฉลี่ยของช่องเดียวกันที่ไม่มีโปร (kitchen, sku, platform, day_of_week, hour); Incremental CM = CM จริง − baseline × CM_full
+- Baseline โปร = แก้วเฉลี่ยของช่องเดียวกันที่ไม่มีโปร (kitchen, sku, platform_code, month, day_of_week, hour) — ต้องมี month เพราะ RC103 จัดเฉพาะหน้าฝน; ทดสอบซ้ำโดยตัดสัปดาห์สงกรานต์ออกจาก baseline; Incremental CM = CM จริง − baseline × CM ที่ราคาเต็ม; รวมผล waste ในวันโปรด้วย; RC102 มีแค่ 12 วัน → ความมั่นใจต่ำ, วัดลูกค้าใหม่ไม่ได้
+- Scenario 3 เดือน: budget ก.ย.–พ.ย. 2026 สมมติว่า flat 2.7M/0.7M เหมือนเดิม; ต้นทุนผลไม้เทียบ 2 แบบ (เฉลี่ย มิ.ย.–ส.ค. 2026 vs สัปดาห์เดียวกันปี 2025 × อัตราเปลี่ยนปีต่อปี)
 - Elasticity: log-log OLS ต่อเมนู ควบคุม hour, weekday, kitchen, platform, month (HC1 SE) + sensitivity ε = −0.5/−1.0/−1.5
 - Waste rate = units_wasted / (units_sold + units_wasted)
 - Critical ratio (newsvendor) = Cu / (Cu + Co), Cu = CM ต่อแก้ว, Co = ต้นทุนแก้วที่ทิ้ง; สมมติฐาน: เตรียม = ขาย + ทิ้ง
@@ -100,6 +118,7 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - `data/raw/` ต้นฉบับ (ห้ามแก้) · `data/processed/` item_mapping.csv, orders_clean.parquet, orders_enriched.parquet, data_quality_log.csv
 - `notebooks/01_data_quality` → `02_demand_pricing` → `03_promotions` → `04_pnl_budget` → `05_forecast_inventory`
 - `src/` load_clean.py, economics.py (enrich, unit_economics), pnl.py, forecast.py — notebook และแอปเรียกจากที่เดียวกัน
+- บทเรียนเป็นแนวทาง ข้อมูลและโค้ดจริงชนะเสมอ: ถ้าต่างจากบทเรียน ให้ใช้ของจริงแล้วบอกผู้ใช้ว่าต่างตรงไหน
 - `outputs/` ตารางผลลัพธ์ที่แอปอ่าน: dq_log, unit_economics, promo_decision, company_pnl, budget_variance, pvm_bridge, menu_matrix, waste_summary, forecast_monthly, scenarios, recommendations (.csv) + FruitBlend24_PnL.xlsx
 - `app/streamlit_app.py` (Executive Summary) + `app/common.py` + `app/pages/1_Data_Quality … 6_Assumptions_and_Method`
 - แอปอ่านจาก outputs/ เท่านั้น ไม่คำนวณหนักตอนเปิด ใช้ `@st.cache_data`
