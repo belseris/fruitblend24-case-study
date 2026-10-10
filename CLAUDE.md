@@ -59,6 +59,8 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - clean orders columns: date, hour, day_of_week, kitchen, item_name_raw, sku, rate_code, platform_code (LM/GB), base_code, sku_code, price_thb, units_sold, gross_revenue_thb, flag_unknown_code, flag_rc101_mismatch — ไม่มีคอลัมน์ month ต้องสร้างเอง
 - `src/economics.py`: enrich(df, sheets) เพิ่ม week_start, commission_rate, discount_pct, fruit_cost_per_cup_thb, pack_labor_per_cup_thb, base_price_thb, list_price_thb, list_revenue_thb, discount_thb, commission_thb, net_revenue_thb, fruit_cost_thb, pack_labor_thb, cm_thb · unit_economics(e, by) คืน cups, list_price, avg_sell_price, cm_per_cup, cm_pct ฯลฯ
 - CM ที่ราคาเต็มต่อแก้ว = list_price_thb × (1 − commission_rate) − fruit_cost_per_cup_thb − pack_labor_per_cup_thb
+- `src/pnl.py`: SUMS, month_key(), add_ratios(), contribution(e, sheets) (month เป็นข้อความ "YYYY-MM"; คอลัมน์ cups, list_revenue, discount, gross_revenue, commission, net_revenue, fruit, pack_labor, cm, waste_units, waste_cost, gp_a, gp_b, gross_profit, gp_pct, waste_rate_pct) · kitchen_pnl(c, sheets) (+overhead, operating_profit, op_margin_pct) · company_pnl(k) · as_statement(df) · budget_variance(m, sheets) · margin_gap(c, v, by) · gp_bridge(v, item_gap) · menu_matrix(c, months, by=None)
+- `src/pnl_excel.py`: write_pnl_xlsx(path, company, kitchen, contrib, variance, overhead), FormulaCheck (ตรวจสูตร Excel ด้วย Python เพราะเครื่องนี้ไม่มี LibreOffice)
 
 ## ข้อเท็จจริงที่ยืนยันแล้ว (notebook 01-02, decisions.md)
 - หลัง clean: 123,655 แถว, 618,123 แก้ว, revenue 31,146,932.57 THB; ไม่มีแถว same-key
@@ -69,6 +71,18 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - Berry: CM 10.02/แก้ว, waste 20.5%, CM หลัง waste −1.92/แก้ว; ยอดลด 67% ตั้งแต่เปิดตัว
 - Elasticity หลัก (RC101 vs RC000): −1.1 (berry) ถึง −1.8 (Guava); day-level −1.5 ถึง −2.1
 - การตัดสินราคาบทที่ 6 อยู่ใน decisions.md (Watermelon 49, PassionFruit 69, Pineapple/Guava test 55, Berry fix cost/review delist, platform price test only)
+- บทที่ 7 (notebook 03, outputs/promo_decision.csv): ทุกโปรขาดทุนหลัง waste + side effects (−14.6k THB/เดือน); Kill = RC101 Watermelon/PassionFruit/berry + RC103 ทั้ง 2 platform (+7.0k/เดือน); Modify + test = RC101 Pineapple (quiet hours), RC101 Guava (10%), RC102 (12%, ไม่รวม berry) (+1.9k/เดือนถ้าผ่าน); วันโปร waste มากขึ้น (RC102 +81%)
+- บทที่ 8-9 (notebook 04): GP-C 7.64M (24.5%) · operating profit −404k (−1.3%), ติดลบ 8/12 เดือน · GP vs budget −764k = revenue effect −325k + margin effect −439k · item gap: berry −686k, PassionFruit −420k, Watermelon +357k, Pineapple +233k, Guava +77k · Ladprao −51.7k/เดือน (ติดลบ 12/12), Sukhumvit −40.5k (9/12), Pattaya Beach +27.7k, Central +31.0k · menu (มี.ค.-ส.ค.): Star Watermelon/Pineapple, Puzzle Guava, Dog PassionFruit/berry · portfolio plan +70.5k (low) ถึง +191.4k (high)/เดือน (outputs/portfolio_decision.csv, in_plan=True เท่านั้นที่บวกกันได้)
+- ตัวเลขทั้งปีที่ใช้ตรวจ P&L: revenue 31,146,932.57 · commission ≈ 8.52M · CM (ก่อน waste) ≈ 8.50M · waste (filled) ≈ 860.3k · overhead 670k/เดือน = 8.04M/ปี · budget ทั้งปี revenue 32.4M, GP 8.4M (25.9%)
+
+## การตัดสินใจล่วงหน้าสำหรับบท 8–14 (ผู้ใช้เลือกแล้ว ไม่ต้องหยุดถาม)
+- Gross profit หลัก = GP-C (หัก commission, fruit, pack+labor, waste) เพราะ waste เป็นต้นทุนผันแปรจริงและ note ของ budget ไม่ได้นิยาม; แสดง GP-A/GP-B เทียบ GP% ของ budget เป็น check
+- Variance vs budget: revenue effect + margin effect (assert ปิด); margin effect แยกเป็น gap ต่อเมนูและต่อครัว; waterfall Budget GP → Actual GP
+- Overhead ไม่ปันลงเมนู; ครัววัดด้วย operating profit
+- Forecast ก.ย.–พ.ย. 2026: ระดับ ก.ย. จากวิธีที่ชนะ backtest (train ≤ 2026-05-31, test มิ.ย.–ส.ค.); ต.ค./พ.ย. = ก.ย. × อัตราเปลี่ยนรายเดือนของปี 2025 (ต.ค./ก.ย., พ.ย./ก.ย.) ของเมนูเดิม; berry ใช้ค่าเฉลี่ยวันในสัปดาห์ 4 สัปดาห์ล่าสุดแบบคงที่ (ไม่มีปีก่อน)
+- Budget ก.ย.–พ.ย. 2026 = flat 2.7M / 0.7M ต่อเดือนเหมือนเดิม
+- Scenario: Base (ราคา/โปรเดิม) · Action (ราคาบท 6 + โปรบท 7 + กฎเตรียมของบท 10 + berry 99 บาท) · Action + delist berry · Downside (fruit +15%, demand −10%); คำนวณในโมเดลเดียวต่อ เดือน × ครัว × เมนู เพื่อไม่นับผลซ้ำ
+- ถ้าเจอ judgment call ใหม่ที่ไม่อยู่ในรายการนี้: เลือกทางที่ระวังที่สุด (กำไรต่ำกว่า), จดลง decisions.md, แล้วบอกผู้ใช้ตอนจบ ไม่ต้องหยุดรอ (ผู้ใช้ต้องส่งงานวันนี้)
 
 ## ปัญหาข้อมูลที่รู้แล้ว
 - `item_name_raw` สะกด/ภาษา/ตัวพิมพ์ไม่สม่ำเสมอ มีสินค้าที่ไม่ใช่เมนู และมีแถวซ้ำแบบ exact
@@ -119,7 +133,7 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - `notebooks/01_data_quality` → `02_demand_pricing` → `03_promotions` → `04_pnl_budget` → `05_forecast_inventory`
 - `src/` load_clean.py, economics.py (enrich, unit_economics), pnl.py, forecast.py — notebook และแอปเรียกจากที่เดียวกัน
 - บทเรียนเป็นแนวทาง ข้อมูลและโค้ดจริงชนะเสมอ: ถ้าต่างจากบทเรียน ให้ใช้ของจริงแล้วบอกผู้ใช้ว่าต่างตรงไหน
-- `outputs/` ตารางผลลัพธ์ที่แอปอ่าน: dq_log, unit_economics, promo_decision, company_pnl, budget_variance, pvm_bridge, menu_matrix, waste_summary, forecast_monthly, scenarios, recommendations (.csv) + FruitBlend24_PnL.xlsx
+- `outputs/` ตารางผลลัพธ์ที่แอปอ่าน: dq_log, unit_economics, promo_decision, company_pnl, kitchen_pnl, item_kitchen_pnl, budget_variance, gp_bridge, item_gap, portfolio_decision, pvm_bridge, menu_matrix, waste_summary, forecast_monthly, scenarios, recommendations (.csv) + FruitBlend24_PnL.xlsx
 - `app/streamlit_app.py` (Executive Summary) + `app/common.py` + `app/pages/1_Data_Quality … 6_Assumptions_and_Method`
 - แอปอ่านจาก outputs/ เท่านั้น ไม่คำนวณหนักตอนเปิด ใช้ `@st.cache_data`
 - `docs/decisions.md` บันทึกการตัดสินใจ · `docs/executive_summary.md` (ภาษาอังกฤษ)
