@@ -112,7 +112,7 @@ Python 3.11+, pandas, pyarrow, openpyxl, numpy, scipy, plotly, statsmodels, stre
 
 ## Checks ที่ต้องผ่านเสมอ
 - revenue ดิบ − ที่ตัดออก = revenue หลัง clean (assert)
-- ผลรวมทุกครัว/เมนูเท่ากับยอดรวมบริษัท และ waste ใน P&L = ผลรวม waste_daily + ส่วนที่เติม 6 kitchen-days (≈฿457, ดู decisions.md)
+- ผลรวมทุกครัว/เมนูเท่ากับยอดรวมบริษัท และ waste ใน P&L = ผลรวม waste_daily ดิบ + ส่วนที่เติม (6 kitchen-days ≈฿457 + berry วันเปิดตัว ≈฿4,002) = ≈฿860.3k (ดู decisions.md)
 - ทุกแถวใน orders join กับ dim tables และต้นทุนได้ครบ (ใช้ merge indicator=True / validate=)
 - notebook รัน Restart & Run All ได้ไม่ error
 - ตัวเลขในแอป = notebook = P&L xlsx

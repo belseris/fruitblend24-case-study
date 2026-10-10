@@ -1,0 +1,32 @@
+item_name_raw,sku,evidence
+Combo Set A (2 แก้ว),DROP,"Not a menu item: RC000 prices 0/35/59/99, 1-3 cups per row, no cost data"
+น้ำส้มปั่น (เมนูทดลอง),DROP,"Not a menu item: RC000 prices 0/35/59/99, 1-3 cups per row, no cost data"
+แก้วเปล่า,DROP,"Not a menu item: RC000 prices 0/35/59/99, 1-3 cups per row, no cost data"
+Guava Ice,Guava,RC000 price 49 = Guava base price; RC101 code GV
+Guava Smoothie,Guava,RC000 price 49 = Guava base price; RC101 code GV
+guava ice,Guava,RC000 price 49 = Guava base price; RC101 code GV
+ฝรั่งปั่น,Guava,RC000 price 49 = Guava base price; RC101 code GV
+ฝรั่งปั่น (ใส่เกลือ),Guava,RC000 price 49 = Guava base price; RC101 code GV
+Mixed Berry (Premium),MixedBerryPremium,RC000 price 89 = MixedBerryPremium base price; RC101 code MB
+Mixed Berry Premium,MixedBerryPremium,RC000 price 89 = MixedBerryPremium base price; RC101 code MB
+berry premium smoothie,MixedBerryPremium,RC000 price 89 = MixedBerryPremium base price; RC101 code MB
+เบอร์รี่ปั่นพรีเมียม,MixedBerryPremium,RC000 price 89 = MixedBerryPremium base price; RC101 code MB
+เบอร์รี่รวมพรีเมียม,MixedBerryPremium,RC000 price 89 = MixedBerryPremium base price; RC101 code MB
+Passion Fruit Ice,PassionFruit,RC000 price 65 = PassionFruit base price; RC101 code PF
+Passion Fruit Smoothie,PassionFruit,RC000 price 65 = PassionFruit base price; RC101 code PF
+passionfruit ice,PassionFruit,RC000 price 65 = PassionFruit base price; RC101 code PF
+เสาวรสปั่น,PassionFruit,RC000 price 65 = PassionFruit base price; RC101 code PF
+เสาวรสปั่นเข้มข้น,PassionFruit,RC000 price 65 = PassionFruit base price; RC101 code PF
+Pineapple Ice,Pineapple,RC000 price 49 = Pineapple base price; RC101 code PA
+Pineapple Smoothie,Pineapple,RC000 price 49 = Pineapple base price; RC101 code PA
+Pineapple smoothie,Pineapple,RC000 price 49 = Pineapple base price; RC101 code PA
+pineapple ice,Pineapple,RC000 price 49 = Pineapple base price; RC101 code PA
+สับปะรดปั่น,Pineapple,RC000 price 49 = Pineapple base price; RC101 code PA
+สัปปะรดปั่น,Pineapple,RC000 price 49 = Pineapple base price; RC101 code PA
+Watermelon Ice,Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
+Watermelon Smoothie,Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
+Watermelon smoothy,Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
+watermelon ice,Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
+แตงโมปั่น,Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
+แตงโมปั่น (ไซส์ M),Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
+แตงโมปั่นสด,Watermelon,RC000 price 45 = Watermelon base price; RC101 code WM
