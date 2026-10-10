@@ -1,0 +1,10 @@
+line,rows,revenue_thb
+Raw orders_hourly,124397,31276898.6
+- Exact duplicate rows (extra copies),-372,-91488.03
+"- Non-menu names (test menu, empty cup, combo)",-370,-38478.0
+- units_sold <= 0 or price_thb <= 0,0,0.0
+- Berry rows before launch 2026-03-01,0,0.0
++ Revenue recalculated as units x price,0,0.0
+Expected clean,123655,31146932.57
+Actual clean,123655,31146932.57
+Difference,0,0.0

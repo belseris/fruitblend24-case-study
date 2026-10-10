@@ -1,0 +1,13 @@
+table,category,issue,rows,pct_rows,revenue_thb,revenue_change_thb,cost_thb,effect,action
+orders_hourly,duplicate,Exact duplicate rows (extra copies),372,0.299,91488.03,0.0,0.0,removed,"Drop, keep first row"
+orders_hourly,naming,"31 raw names (language, typos, case, spaces)",124025,99.701,31185410.57,0.0,0.0,fixed,Map with item_mapping.csv to 5 SKUs or DROP
+orders_hourly,not a sale,"Non-menu names (test menu, empty cup, combo)",370,0.297,38478.0,0.0,0.0,removed,Drop
+orders_hourly,invalid value,units_sold <= 0 or price_thb <= 0,0,0.0,0.0,0.0,0.0,removed,Drop
+orders_hourly,invalid value,gross_revenue_thb != units x price,0,0.0,0.0,0.0,0.0,fixed,Recalculate as units x price
+orders_hourly,code,rate_code not in the dim tables,0,0.0,0.0,0.0,0.0,flagged,"Keep, flag_unknown_code"
+orders_hourly,code,RC101 SKU part does not match the item,0,0.0,0.0,0.0,0.0,flagged,"Keep, flag_rc101_mismatch"
+orders_hourly,not a sale,Berry rows before launch 2026-03-01,0,0.0,0.0,0.0,0.0,removed,Drop
+orders_hourly,same key,Rows sharing date-hour-kitchen-sku-rate_code,0,0.0,0.0,0.0,0.0,info,"Keep, sum by key in the enrich step"
+weekly_fruit_cost,missing,No berry fruit cost for launch week 2026-02-23,1,0.417,0.0,0.0,0.0,filled,Copy week 2026-03-02 (33.69 THB per cup)
+waste_daily,missing,Blank waste cost on berry launch day,4,0.061,0.0,0.0,4002.24,filled,Units x 41.69 THB per wasted cup (week 2026-03-02)
+waste_daily,missing,Missing kitchen-day rows,6,0.091,0.0,0.0,456.54,filled,"Add row with kitchen x SKU mean units and cost, is_filled=True"
