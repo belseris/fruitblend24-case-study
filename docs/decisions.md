@@ -1,3 +1,6 @@
-| วันที่ | บท | การตัดสินใจ | เหตุผล | ผลกระทบ (ตัวเลข) |
+| Date | Lesson | Decision | Reason | Impact |
 |---|---|---|---|---|
-
+| 2026-10-10 | 3 | Fill the 6 missing `waste_daily` kitchen-days with the mean units and cost of the same kitchen and SKU (in the cleaning step). | Only 6 days, all on different dates, so it looks like missed entries. Fill 0 would say "no waste" on days that had waste. | Adds about 27 cups and 457 THB (0.05%). P&L waste = raw 855.8k + 0.5k filled = 856.3k THB. |
+| 2026-10-10 | 3 | Use the first berry fruit cost week (2026-03-02) for berry launch day 2026-03-01, in `waste_daily` and in orders. | Launch day is a Sunday, one day before the first berry cost week. The 96 wasted cups and 322 sold cups are real, so they need a cost. | Adds about 4.0k THB waste in March 2026. Gives fruit cost to 322 launch-day cups (28.7k THB revenue), so CM is not too high. |
+| 2026-10-10 | 3 | Drop the 372 exact duplicate copies in `orders_hourly`, keep the first row. | Data is one row per date-hour-kitchen-name-code. Only these 372 pairs break that rule, and they match the overall platform and cup mix, so it looks like a double export. | -372 rows, -1.8k cups, -91.5k THB revenue (0.29%). |
+| 2026-10-10 | 3 | DROP the 3 non-menu names (orange test menu, empty cup, Combo Set A). | Same random prices 0/35/59/99 at full-price code RC000, 1-3 cups per row, and no cost data. Not real menu sales. | -374 rows, -768 cups, -39k THB revenue (0.12%). Also removes all 85 price-0 rows. |

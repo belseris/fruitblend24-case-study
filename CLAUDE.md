@@ -6,16 +6,34 @@
 ผู้ใช้กำลังเรียนรู้งานนี้ตามบทเรียน 14 บท (บท 1–14) เพื่อสมัครฝึกงาน และต้องอธิบายทุกตัวเลขได้เองตอนสัมภาษณ์
 
 ## วิธีทำงานกับผู้ใช้ (สำคัญ)
-- อธิบายเป็นภาษาไทยแบบเข้าใจง่าย ไม่เป็นทางการเกินไป ทีละขั้น
-- โหมดสอน: หลังทำแต่ละขั้นเสร็จ อธิบายว่าทำไมทำแบบนี้ และตัวเลขที่ได้แปลว่าอะไร ถ้าผู้ใช้ขอให้ทดสอบ ให้ถามทีละข้อแล้วรอคำตอบ
-- คอมเมนต์ในโค้ดเป็นภาษาไทย
-- ทุกอย่างที่อยู่ในแอปและผลงานที่ส่ง (หัวข้อ กราฟ ข้อความ) เป็นภาษาอังกฤษ หัวกราฟเขียนเป็นข้อสรุป (action title)
+- คุยและอธิบายกับผู้ใช้ในแชตเป็นภาษาไทยแบบเข้าใจง่าย ไม่เป็นทางการเกินไป ทีละขั้น
+- โหมดสอน: หลังทำแต่ละขั้นเสร็จ อธิบายเป็นภาษาไทยว่าทำไมทำแบบนี้ และตัวเลขที่ได้แปลว่าอะไร ถ้าผู้ใช้ขอให้ทดสอบ ให้ถามทีละข้อแล้วรอคำตอบ
+- ทุกไฟล์ที่ขึ้น GitHub เป็นภาษาอังกฤษทั้งหมด: คอมเมนต์ในโค้ด, markdown ใน notebook, docs/decisions.md, README, ข้อความในแอป
+- คอมเมนต์ภาษาอังกฤษต้องสั้นและง่าย (ระดับ B1): ประโยคสั้น คำศัพท์พื้นฐาน บอก "why" ไม่ใช่แค่ "what" ผู้ใช้ภาษาอังกฤษยังไม่แข็ง
+- หลังเขียนโค้ดหรือ notebook ใหม่ ให้สรุปในแชตเป็นภาษาไทยว่าแต่ละส่วนทำอะไร และแปลคำศัพท์เทคนิคที่ใช้ในคอมเมนต์
+- โน้ตเรียนรู้ภาษาไทยของผู้ใช้อยู่ใน `notes/` (ไม่ขึ้น GitHub) ถ้าผู้ใช้ขอ ให้เขียนคำอธิบายภาษาไทยลงที่นั่น ห้ามใส่ภาษาไทยในไฟล์ที่จะส่ง
+- หัวกราฟในแอปเขียนเป็นข้อสรุป (action title)
 - ให้ไฟล์โค้ดที่ครบและรันได้ ไม่ใช่ snippet ครึ่ง ๆ
 - ก่อนตัดสินใจเรื่องที่เป็น judgment call (ลบข้อมูล, นิยาม gross profit, โค้ดราคาปกติ, เลือกโมเดล) ให้เสนอทางเลือกและเหตุผลให้ผู้ใช้เลือกก่อน
-- ทุกครั้งที่ตัดสินใจหรือตั้ง assumption ให้เพิ่ม 1 บรรทัดใน `docs/decisions.md` (วันที่ | บท | การตัดสินใจ | เหตุผล | ผลกระทบเป็นตัวเลข)
+- ทุกครั้งที่ตัดสินใจหรือตั้ง assumption ให้เพิ่ม 1 บรรทัดภาษาอังกฤษใน `docs/decisions.md` (Date | Lesson | Decision | Reason | Impact) แล้วแปลบรรทัดนั้นเป็นไทยในแชตให้ผู้ใช้ตรวจ
 - หลังคำนวณเสร็จ ต้องแสดงผลการรันจริงและ reconciliation check (assert) ไม่ใช่แค่บอกว่าเสร็จ
 - ห้ามแก้ไฟล์ใน `data/raw/`
 - ชื่อคอลัมน์ที่ไม่ได้อยู่ใน data dictionary (เช่นใน cost_assumptions) ต้องเปิดดูไฟล์จริงก่อนเขียนโค้ด ห้ามเดา
+
+## Writing style for notebooks, comments and docs (must read like a real analyst wrote it)
+Write like a working data analyst's notebook, not a tutorial or a chatbot answer.
+- Notebook = a chain of questions. Each section header is a question ("Are there duplicate rows?"), not a topic ("Duplicate Analysis").
+- Markdown cells: 1-3 short lines, number first. Example: "**1,184 exact duplicates (0.6% of rows, ฿92k).** Same export twice -> drop in lesson 4." Fragments are fine.
+- Write what the number means and what we do next. Do not describe what the code does.
+- Say what looks normal too, in one line ("Dates: 365 days, no gaps. OK.").
+- Keep open questions visible: "? Is RC000 the normal price - check conditions." and "TODO:".
+- Keep dead ends short: "Checked hour 25+ - none."
+- Code comments: only where the reason is not obvious. No comment that repeats the code. No "===== Cell 1 =====" banners.
+- Docstrings: one line.
+- Tables: only the columns needed for the point. Round numbers (฿92k, 0.6%).
+- Chart titles state the finding.
+- BANNED: emojis, ✅/❌, "Let's", "dive into", "comprehensive", "robust", "leverage", "crucial", "it's worth noting", "In conclusion", "Key takeaways", "This analysis provides", bold on every line, a summary that repeats the cells above, long bullet lists, perfectly symmetric sections, em dashes.
+- End of notebook: a short "Findings -> next steps" list (max 5 lines), each with a number.
 
 ## ข้อมูล (data/raw/FruitBlend24_Intern_Case_Data.xlsx)
 - ช่วงข้อมูล: 2025-09-01 ถึง 2026-08-31 (12 เดือน)
@@ -86,6 +104,7 @@
 - `app/streamlit_app.py` (Executive Summary) + `app/common.py` + `app/pages/1_Data_Quality … 6_Assumptions_and_Method`
 - แอปอ่านจาก outputs/ เท่านั้น ไม่คำนวณหนักตอนเปิด ใช้ `@st.cache_data`
 - `docs/decisions.md` บันทึกการตัดสินใจ · `docs/executive_summary.md` (ภาษาอังกฤษ)
+- `notes/` โน้ตเรียนรู้ภาษาไทยส่วนตัว (อยู่ใน .gitignore)
 
 ## Stack
 Python 3.11+, pandas, pyarrow, openpyxl, numpy, scipy, plotly, statsmodels, streamlit, jupyter
@@ -93,7 +112,7 @@ Python 3.11+, pandas, pyarrow, openpyxl, numpy, scipy, plotly, statsmodels, stre
 
 ## Checks ที่ต้องผ่านเสมอ
 - revenue ดิบ − ที่ตัดออก = revenue หลัง clean (assert)
-- ผลรวมทุกครัว/เมนูเท่ากับยอดรวมบริษัท และ waste ใน P&L = ผลรวม waste_daily
+- ผลรวมทุกครัว/เมนูเท่ากับยอดรวมบริษัท และ waste ใน P&L = ผลรวม waste_daily + ส่วนที่เติม 6 kitchen-days (≈฿457, ดู decisions.md)
 - ทุกแถวใน orders join กับ dim tables และต้นทุนได้ครบ (ใช้ merge indicator=True / validate=)
 - notebook รัน Restart & Run All ได้ไม่ error
 - ตัวเลขในแอป = notebook = P&L xlsx
