@@ -76,6 +76,7 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 - บทที่ 7 (notebook 03, outputs/promo_decision.csv): ทุกโปรขาดทุนหลัง waste + side effects (−14.6k THB/เดือน); Kill = RC101 Watermelon/PassionFruit/berry + RC103 ทั้ง 2 platform (+7.0k/เดือน); Modify + test = RC101 Pineapple (quiet hours), RC101 Guava (10%), RC102 (12%, ไม่รวม berry) (+1.9k/เดือนถ้าผ่าน); วันโปร waste มากขึ้น (RC102 +81%)
 - บทที่ 8-9 (notebook 04): GP-C 7.64M (24.5%) · operating profit −404k (−1.3%), ติดลบ 8/12 เดือน · GP vs budget −764k = revenue effect −325k + margin effect −439k · item gap: berry −686k, PassionFruit −420k, Watermelon +357k, Pineapple +233k, Guava +77k · Ladprao −51.7k/เดือน (ติดลบ 12/12), Sukhumvit −40.5k (9/12), Pattaya Beach +27.7k, Central +31.0k · menu (มี.ค.-ส.ค.): Star Watermelon/Pineapple, Puzzle Guava, Dog PassionFruit/berry · portfolio plan +70.5k (low) ถึง +191.4k (high)/เดือน (outputs/portfolio_decision.csv, in_plan=True เท่านั้นที่บวกกันได้)
 - บทที่ 10-11 (notebook 05): berry 39% ของ waste THB (แก้ว 4.5%) · CR berry 0.05, PF 0.16, เมนูถูก 0.44-0.49 · กฎเตรียมของใช้เฉพาะ berry + PF ที่ CR+0.1 (+29.6k/เดือนใน backtest ส.ค.) เมนูถูกใช้แบบเดิม · forecast ชนะ = seasonal naive (WAPE 46.6%, ทุกวิธีพลาดฤดู 45-63%) · ก.ย.-พ.ย. 2026 เมนูเดิม −2.0% vs 2025 · Scenario 3 เดือน operating profit: Base −685k, Action −408k (+92.4k/เดือน: rule 40.2k, ราคา W/PF 27.2k, berry 99 13.5k, kill โปร 11.5k), Action+delist −450k, Downside −787k (Base downside −1,106k) · ไม่ delist berry ตอนนี้ ใช้ stop rule
+- บทที่ 12 (notebook 06, docs/executive_summary.md): ผลรวม Action vs Base = +92.4k ถึง +118.1k/เดือน (elasticity −1.5/−0.5) จาก scenarios.csv · กฎเตรียมของวันโปร × lift อยู่ใน prep_rule(lift=...) แล้ว (short วันโปร 32.5% → 13.8%) · insight 3 ข้อถูกปรับถ้อยคำให้ตรงข้อมูล
 - ตัวเลขทั้งปีที่ใช้ตรวจ P&L: revenue 31,146,932.57 · commission ≈ 8.52M · CM (ก่อน waste) ≈ 8.50M · waste (filled) ≈ 860.3k · overhead 670k/เดือน = 8.04M/ปี · budget ทั้งปี revenue 32.4M, GP 8.4M (25.9%)
 
 ## การตัดสินใจล่วงหน้าสำหรับบท 8–14 (ผู้ใช้เลือกแล้ว ไม่ต้องหยุดถาม)
@@ -133,10 +134,10 @@ Write like a working data analyst's notebook, not a tutorial or a chatbot answer
 
 ## โครงโปรเจกต์
 - `data/raw/` ต้นฉบับ (ห้ามแก้) · `data/processed/` item_mapping.csv, orders_clean.parquet, orders_enriched.parquet, data_quality_log.csv
-- `notebooks/01_data_quality` → `02_demand_pricing` → `03_promotions` → `04_pnl_budget` → `05_forecast_inventory`
+- `notebooks/01_data_quality` → `02_demand_pricing` → `03_promotions` → `04_pnl_budget` → `05_forecast_inventory` → `06_summary` (ตรวจตัวเลข insight + สร้าง recommendations/insights.csv)
 - `src/` load_clean.py, economics.py (enrich, unit_economics), pnl.py, forecast.py — notebook และแอปเรียกจากที่เดียวกัน
 - บทเรียนเป็นแนวทาง ข้อมูลและโค้ดจริงชนะเสมอ: ถ้าต่างจากบทเรียน ให้ใช้ของจริงแล้วบอกผู้ใช้ว่าต่างตรงไหน
-- `outputs/` ตารางผลลัพธ์ที่แอปอ่าน: dq_log, unit_economics, promo_decision, company_pnl, kitchen_pnl, item_kitchen_pnl, budget_variance, gp_bridge, item_gap, portfolio_decision, pvm_bridge, menu_matrix, waste_summary, prep_rule_backtest, forecast_backtest, forecast_monthly, inventory_plan, scenarios, scenario_summary, profit_plan, recommendations (.csv) + FruitBlend24_PnL.xlsx
+- `outputs/` ตารางผลลัพธ์ที่แอปอ่าน: dq_log, unit_economics, promo_decision, company_pnl, kitchen_pnl, item_kitchen_pnl, budget_variance, gp_bridge, item_gap, portfolio_decision, pvm_bridge, menu_matrix, waste_summary, prep_rule_backtest, forecast_backtest, forecast_monthly, inventory_plan, scenarios, scenario_summary, scenario_levers, profit_plan, recommendations, insights (.csv) + FruitBlend24_PnL.xlsx
 - `app/streamlit_app.py` (Executive Summary) + `app/common.py` + `app/pages/1_Data_Quality … 6_Assumptions_and_Method`
 - แอปอ่านจาก outputs/ เท่านั้น ไม่คำนวณหนักตอนเปิด ใช้ `@st.cache_data`
 - `docs/decisions.md` บันทึกการตัดสินใจ · `docs/executive_summary.md` (ภาษาอังกฤษ)

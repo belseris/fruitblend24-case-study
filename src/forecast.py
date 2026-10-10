@@ -25,8 +25,14 @@ def daily_panel(e: pd.DataFrame, sheets: dict) -> pd.DataFrame:
     # waste_daily already has one row per kitchen-item-day from the item's first day.
     p = w.join(sales, how="outer").fillna(0.0).reset_index()
     assert len(p) == len(w), "sales on a day without a waste row"
+    # Promo code of the day. No kitchen-item-day has two codes, so the top code is the only one.
+    top = (e[promo].groupby(DAY_KEYS + ["base_code"])["units_sold"].sum().reset_index()
+           .sort_values("units_sold").drop_duplicates(DAY_KEYS, keep="last"))
+    p = p.merge(top[DAY_KEYS + ["base_code"]].rename(columns={"base_code": "promo_code"}),
+                on=DAY_KEYS, how="left", validate="one_to_one")
     p["dow"] = p["date"].dt.dayofweek
     p["promo_day"] = p["promo_cups"] > 0
+    assert (p["promo_day"] == p["promo_code"].notna()).all()
     p["month"] = p["date"].dt.strftime("%Y-%m")
     return p.sort_values(DAY_KEYS).reset_index(drop=True)
 
@@ -37,10 +43,11 @@ def critical_ratio(cu, co):
     return np.clip(cr, 0.05, 0.95)
 
 
-def prep_rule(p: pd.DataFrame, q: dict, weeks: int = 8, min_obs: int = 4) -> pd.DataFrame:
+def prep_rule(p: pd.DataFrame, q: dict, weeks: int = 8, min_obs: int = 4, lift: dict | None = None) -> pd.DataFrame:
     """Prep = q-quantile of the last `weeks` normal days with the same weekday, before the day.
 
-    Promo days are left out of the history and get the same prep as a normal day.
+    Promo days are left out of the history. They get the normal-day prep, times the measured
+    lift of their code if `lift` is given ({(code, sku) or (code, "All"): cups / baseline}).
     Also returns the mean and std of the same window, for the normal check.
     """
     out = []
@@ -51,6 +58,10 @@ def prep_rule(p: pd.DataFrame, q: dict, weeks: int = 8, min_obs: int = 4) -> pd.
         # ffill gives promo days the last normal value; shift(1) uses only days before this one.
         out.append(stats.reindex(g.index).ffill().shift(1))
     res = pd.concat(out).reindex(p.index)
+    if lift:
+        mult = [lift.get((c, s), lift.get((c, "All"), 1.0)) if isinstance(c, str) else 1.0
+                for c, s in zip(p["promo_code"], p["sku"])]
+        res["prep"] = res["prep"] * np.array(mult)
     res["prep"] = np.ceil(res["prep"])
     return res
 
