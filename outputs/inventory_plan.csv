@@ -1,0 +1,201 @@
+month,kitchen,sku,demand,cups,prep_cups,waste_cups,short_cups,waste_rate_pct,fruit_budget_thb,fruit_budget_downside_thb,rule,level,dow
+2026-09,BKK_Ladprao,Guava,1119.9250968748427,1119.9250968748427,1206.012053396582,86.08695652173913,0.0,7.138150591388037,12344.65468223291,14196.352884567845,today's prep,month,
+2026-09,BKK_Ladprao,MixedBerryPremium,290.4503599867304,215.30529944493054,230.39351520366074,15.088215758730215,75.14506054179985,6.5488890802298405,10391.038047046273,11949.693754103213,CR + 0.1 quantile,month,
+2026-09,BKK_Ladprao,PassionFruit,674.6997455021773,600.3369081348015,624.2063353292882,23.869427194486676,74.36283736737575,3.823964263658877,17279.346925830017,19871.24896470452,CR + 0.1 quantile,month,
+2026-09,BKK_Ladprao,Pineapple,1530.7121030647677,1530.7121030647677,1646.1468856734634,115.43478260869566,0.0,7.012422986875169,15225.11894935776,17508.886791761423,today's prep,month,
+2026-09,BKK_Ladprao,Watermelon,2116.288777675905,2116.288777675905,2248.9971858685026,132.70840819259791,0.0,5.900781425004295,17867.761114285113,20547.925281427877,today's prep,month,
+2026-09,BKK_Sukhumvit,Guava,1590.0508982939962,1590.0508982939962,1675.1595939461702,85.1086956521739,0.0,5.080632075877829,17146.815959802727,19718.838353773135,today's prep,month,
+2026-09,BKK_Sukhumvit,MixedBerryPremium,500.910314872226,424.39623934071335,439.7593366870395,15.363097346326143,76.51407553151269,3.493523858314233,19833.700592742436,22808.755681653798,CR + 0.1 quantile,month,
+2026-09,BKK_Sukhumvit,PassionFruit,1131.088042852826,1024.6591443766613,1058.821327175253,34.162182798591616,106.42889847616469,3.226435086052738,29310.40588538307,33706.96676819053,CR + 0.1 quantile,month,
+2026-09,BKK_Sukhumvit,Pineapple,2576.191324040058,2576.191324040058,2687.0608892574496,110.8695652173913,0.0,4.126053326913233,24852.473384460147,28580.344392129165,today's prep,month,
+2026-09,BKK_Sukhumvit,Watermelon,3460.302709515128,3460.302709515128,3590.411405167302,130.10869565217394,0.0,3.6237823739341444,28524.9860216077,32803.73392484885,today's prep,month,
+2026-09,Pattaya_Beach,Guava,1671.7472095012834,1671.7472095012834,1771.8559051534573,100.1086956521739,0.0,5.649934363229366,18136.59261049028,20857.08150206382,today's prep,month,
+2026-09,Pattaya_Beach,MixedBerryPremium,591.7576538270188,513.834880624212,529.4808273587755,15.64594673456348,77.92277320280674,2.954960014815004,23880.252955049997,27462.290898307496,CR + 0.1 quantile,month,
+2026-09,Pattaya_Beach,PassionFruit,1451.044639350301,1344.2080709503105,1378.5011100732522,34.29303912294178,106.8365683999905,2.487704860906458,38159.81602626949,43883.788430209905,CR + 0.1 quantile,month,
+2026-09,Pattaya_Beach,Pineapple,2943.0204619797696,2943.0204619797696,3063.3465489362916,120.32608695652175,0.0,3.927929309803472,28332.718056067384,32582.62576447749,today's prep,month,
+2026-09,Pattaya_Beach,Watermelon,3791.055919443317,3791.055919443317,3937.142875965056,146.08695652173913,0.0,3.7104814614057124,31279.687152381473,35971.64022523869,today's prep,month,
+2026-09,Pattaya_Central,Guava,2178.5248553167935,2178.5248553167935,2301.459637925489,122.93478260869564,0.0,5.34160063391369,23557.579225905494,27091.216109791316,today's prep,month,
+2026-09,Pattaya_Central,MixedBerryPremium,632.5891728866703,515.9295857732179,539.353414405481,23.423828632263053,116.6595871134524,4.342946203109272,24325.51907955185,27974.346941484626,CR + 0.1 quantile,month,
+2026-09,Pattaya_Central,PassionFruit,1531.3880152806123,1422.474144699488,1457.4339686699277,34.959823970439615,108.91387058112421,2.3987243828510723,40344.843909429204,46396.57049584358,CR + 0.1 quantile,month,
+2026-09,Pattaya_Central,Pineapple,3392.2316944290674,3392.2316944290674,3539.6229987768934,147.39130434782606,0.0,4.1640396279139535,32737.77186062769,37648.437639721844,today's prep,month,
+2026-09,Pattaya_Central,Watermelon,4599.190962579734,4599.190962579734,4765.821397362343,166.6304347826087,0.0,3.496363394457685,37863.34583986347,43542.84771584299,today's prep,month,
+2026-10,BKK_Ladprao,Guava,1183.975511799657,1183.975511799657,1272.9320335387874,88.95652173913044,0.0,6.988316688977397,13029.642899283304,14984.089334175798,today's prep,month,
+2026-10,BKK_Ladprao,MixedBerryPremium,306.21935248158945,226.99455213239702,242.90193010897093,15.907377976573926,79.22480034919245,6.548889080229844,10955.183331580105,12598.46083131712,CR + 0.1 quantile,month,
+2026-10,BKK_Ladprao,PassionFruit,696.5959596053475,619.8198048784056,644.4638730770645,24.644068198658843,76.77615472694187,3.8239642636588766,17840.118265041543,20516.136004797772,CR + 0.1 quantile,month,
+2026-10,BKK_Ladprao,Pineapple,1559.0475069098222,1559.0475069098222,1678.3301156054745,119.28260869565219,0.0,7.107219705261607,15522.77981313234,17851.19678510219,today's prep,month,
+2026-10,BKK_Ladprao,Watermelon,2128.5024285012237,2128.5024285012237,2265.6344503002415,137.13202179901785,0.0,6.052698473968081,17999.940322124676,20699.931370443377,today's prep,month,
+2026-10,BKK_Sukhumvit,Guava,1619.8267748718365,1619.8267748718365,1707.7724270457495,87.94565217391305,0.0,5.14972901430719,17480.638629061916,20102.734423421203,today's prep,month,
+2026-10,BKK_Sukhumvit,MixedBerryPremium,524.3507091213409,444.25611220143816,460.3381347684942,16.082022567056086,80.09459691990271,3.4935238583142354,20761.830334752995,23876.104884965942,CR + 0.1 quantile,month,
+2026-10,BKK_Sukhumvit,PassionFruit,1097.733261150166,994.4428563553363,1027.5976267275182,33.154770372181886,103.29040479482974,3.226435086052737,28446.068050586844,32712.97825817487,CR + 0.1 quantile,month,
+2026-10,BKK_Sukhumvit,Pineapple,2705.5401143626386,2705.5401143626386,2820.105331753943,114.56521739130434,0.0,4.062444622238679,26082.9938685003,29995.442948775344,today's prep,month,
+2026-10,BKK_Sukhumvit,Watermelon,3563.9878251933515,3563.9878251933515,3698.4334773672645,134.44565217391306,0.0,3.6352053645593325,29383.196335638677,33790.67578598447,today's prep,month,
+2026-10,Pattaya_Beach,Guava,1800.0981309169592,1800.0981309169592,1903.5437830908722,103.44565217391305,0.0,5.434372095499876,19484.540480824588,22407.221552948275,today's prep,month,
+2026-10,Pattaya_Beach,MixedBerryPremium,619.6730324327827,538.0743562620978,554.4583796804461,16.384023418348363,81.598676170685,2.9549600148150077,25006.772059839644,28757.78786881559,CR + 0.1 quantile,month,
+2026-10,Pattaya_Beach,PassionFruit,1576.3922979598735,1460.3267138978863,1497.5821375292687,37.2554236313824,116.06558406198721,2.4877048609064545,41456.22983887735,47674.66431470895,CR + 0.1 quantile,month,
+2026-10,Pattaya_Beach,Pineapple,2906.472243773386,2906.472243773386,3030.809200295125,124.33695652173914,0.0,4.102434310600345,28031.781968486222,32236.549263759152,today's prep,month,
+2026-10,Pattaya_Beach,Watermelon,3783.438556745555,3783.438556745555,3934.3950784846857,150.95652173913044,0.0,3.836841972598,31257.856538595828,35946.5350193852,today's prep,month,
+2026-10,Pattaya_Central,Guava,2245.040984349052,2245.040984349052,2372.073593044704,127.03260869565217,0.0,5.355340115421879,24280.37871139849,27922.43551810826,today's prep,month,
+2026-10,Pattaya_Central,MixedBerryPremium,655.6033781494375,534.699602550357,558.9756126983466,24.276010147989666,120.90377559908057,4.342946203109277,25210.504964886408,28992.080709619368,CR + 0.1 quantile,month,
+2026-10,Pattaya_Central,PassionFruit,1552.6298731779218,1442.205260094672,1477.6500112066885,35.444751112016476,110.42461308324975,2.398724382851075,40904.466573745405,47040.136559807215,CR + 0.1 quantile,month,
+2026-10,Pattaya_Central,Pineapple,3655.0330088179226,3655.0330088179226,3807.3373566440096,152.30434782608694,0.0,4.0002850695725085,35213.84673490006,40495.923745135064,today's prep,month,
+2026-10,Pattaya_Central,Watermelon,4555.828658999488,4555.828658999488,4728.013441608184,172.18478260869563,0.0,3.641799769294412,37562.970398809324,43197.41595863072,today's prep,month,
+2026-11,BKK_Ladprao,Guava,1219.563829787234,1219.563829787234,1305.6507863089732,86.08695652173913,0.0,6.593413600669118,13364.549754852249,15369.232218080086,today's prep,month,
+2026-11,BKK_Ladprao,MixedBerryPremium,299.05839019779734,221.68626768442402,237.22165044645277,15.535382762028732,77.3721225133733,6.548889080229833,10698.995556334286,12303.844889784428,CR + 0.1 quantile,month,
+2026-11,BKK_Ladprao,PassionFruit,836.2024535329344,744.0394025272045,773.6224484932284,29.58304596602386,92.16305100572993,3.823964263658878,21415.49984441072,24627.824821072325,CR + 0.1 quantile,month,
+2026-11,BKK_Ladprao,Pineapple,1628.7341996455996,1628.7341996455996,1744.1689822542953,115.43478260869566,0.0,6.618325620003805,16131.719747316343,18551.477709413793,today's prep,month,
+2026-11,BKK_Ladprao,Watermelon,2462.3071090013405,2462.3071090013405,2595.015517193938,132.70840819259791,0.0,5.113973589495109,20616.7965173236,23709.315994922137,today's prep,month,
+2026-11,BKK_Sukhumvit,Guava,1770.3060869565218,1770.3060869565218,1855.4147826086958,85.1086956521739,0.0,4.587044172005134,18991.895411913225,21840.679723700207,today's prep,month,
+2026-11,BKK_Sukhumvit,MixedBerryPremium,503.6152919645043,426.68803104749526,442.13409100240506,15.446059954909785,76.92726091700904,3.493523858314233,19940.80500677743,22931.925757794044,CR + 0.1 quantile,month,
+2026-11,BKK_Sukhumvit,PassionFruit,1284.415955162249,1163.5597794145615,1202.3529157463809,38.793136331819355,120.85617574768752,3.226435086052738,33283.66276113661,38276.212175307104,CR + 0.1 quantile,month,
+2026-11,BKK_Sukhumvit,Pineapple,3058.2812499999995,3058.2812499999995,3169.150815217391,110.8695652173913,0.0,3.4983997822074646,29311.29569910695,33707.99005397299,today's prep,month,
+2026-11,BKK_Sukhumvit,Watermelon,4163.228027821804,4163.228027821804,4293.336723473978,130.10869565217394,0.0,3.0304796486331904,34109.56467186345,39225.99937264297,today's prep,month,
+2026-11,Pattaya_Beach,Guava,1947.6383315733897,1947.6383315733897,2047.7470272255637,100.1086956521739,0.0,4.888723769156605,20960.59476061968,24104.68397471263,today's prep,month,
+2026-11,Pattaya_Beach,MixedBerryPremium,604.8756247138053,525.2254743259612,541.2182574257712,15.992783099810069,79.65015038784422,2.954960014815003,24409.625851213696,28071.06972889575,CR + 0.1 quantile,month,
+2026-11,Pattaya_Beach,PassionFruit,1895.0459630923451,1755.5187547855821,1800.3050305415065,44.786275755924464,139.52720830676304,2.487704860906453,49836.23752974762,57311.67315920976,CR + 0.1 quantile,month,
+2026-11,Pattaya_Beach,Pineapple,3469.633507853403,3469.633507853403,3589.959594809925,120.32608695652175,0.0,3.3517393101159003,33203.33217531075,38183.83200160736,today's prep,month,
+2026-11,Pattaya_Beach,Watermelon,4533.624339000977,4533.624339000977,4679.711295522716,146.08695652173913,0.0,3.1217087400563983,37179.22104910565,42756.10420647149,today's prep,month,
+2026-11,Pattaya_Central,Guava,2527.7727272727275,2527.7727272727275,2650.707509881423,122.93478260869564,0.0,4.637810175223558,27132.45591611629,31202.324303533733,today's prep,month,
+2026-11,Pattaya_Central,MixedBerryPremium,649.830670384835,529.9914746635163,554.0537300979925,24.06225543447607,119.83919572131873,4.342946203109275,24988.521853433962,28736.800131449054,CR + 0.1 quantile,month,
+2026-11,Pattaya_Central,PassionFruit,1885.4531211948267,1751.3577807719353,1794.4005031674144,43.04272239547916,134.0953404228915,2.398724382851076,49672.7877677772,57123.705932943776,CR + 0.1 quantile,month,
+2026-11,Pattaya_Central,Pineapple,4121.395121951219,4121.395121951219,4268.786426299045,147.39130434782606,0.0,3.4527682959208494,39481.76294317579,45404.02738465215,today's prep,month,
+2026-11,Pattaya_Central,Watermelon,5608.151188089765,5608.151188089765,5774.781622872374,166.6304347826087,0.0,2.8854846064244204,45879.30086039703,52761.19598945658,today's prep,month,
+2026-09,BKK_Ladprao,Guava,20.0,,23.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Ladprao,Guava,39.0,,42.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Ladprao,Guava,33.0,,36.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Ladprao,Guava,40.0,,43.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Ladprao,Guava,42.0,,45.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Ladprao,Guava,38.0,,41.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Ladprao,Guava,53.0,,56.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Ladprao,MixedBerryPremium,10.0,,8.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Ladprao,MixedBerryPremium,9.0,,7.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Ladprao,MixedBerryPremium,8.0,,7.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Ladprao,MixedBerryPremium,11.0,,9.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Ladprao,MixedBerryPremium,11.0,,9.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Ladprao,MixedBerryPremium,11.0,,9.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Ladprao,MixedBerryPremium,12.0,,9.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Ladprao,PassionFruit,20.0,,19.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Ladprao,PassionFruit,21.0,,20.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Ladprao,PassionFruit,29.0,,27.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Ladprao,PassionFruit,24.0,,22.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Ladprao,PassionFruit,22.0,,20.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Ladprao,PassionFruit,19.0,,18.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Ladprao,PassionFruit,24.0,,22.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Ladprao,Pineapple,41.0,,45.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Ladprao,Pineapple,45.0,,49.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Ladprao,Pineapple,58.0,,62.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Ladprao,Pineapple,47.0,,51.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Ladprao,Pineapple,52.0,,56.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Ladprao,Pineapple,51.0,,55.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Ladprao,Pineapple,68.0,,71.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Ladprao,Watermelon,71.0,,75.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Ladprao,Watermelon,69.0,,74.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Ladprao,Watermelon,65.0,,69.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Ladprao,Watermelon,78.0,,82.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Ladprao,Watermelon,65.0,,69.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Ladprao,Watermelon,67.0,,71.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Ladprao,Watermelon,84.0,,88.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Sukhumvit,Guava,54.0,,57.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Sukhumvit,Guava,58.0,,61.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Sukhumvit,Guava,59.0,,62.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Sukhumvit,Guava,52.0,,55.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Sukhumvit,Guava,45.0,,48.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Sukhumvit,Guava,53.0,,56.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Sukhumvit,Guava,52.0,,55.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,16.0,,14.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,17.0,,15.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,17.0,,15.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,17.0,,15.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,15.0,,13.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,25.0,,22.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Sukhumvit,MixedBerryPremium,14.0,,13.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Sukhumvit,PassionFruit,38.0,,36.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Sukhumvit,PassionFruit,43.0,,40.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Sukhumvit,PassionFruit,41.0,,38.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Sukhumvit,PassionFruit,36.0,,34.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Sukhumvit,PassionFruit,31.0,,29.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Sukhumvit,PassionFruit,36.0,,33.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Sukhumvit,PassionFruit,41.0,,38.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Sukhumvit,Pineapple,86.0,,90.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Sukhumvit,Pineapple,76.0,,80.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Sukhumvit,Pineapple,81.0,,85.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Sukhumvit,Pineapple,82.0,,86.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Sukhumvit,Pineapple,82.0,,86.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Sukhumvit,Pineapple,94.0,,98.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Sukhumvit,Pineapple,105.0,,109.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,BKK_Sukhumvit,Watermelon,118.0,,122.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,BKK_Sukhumvit,Watermelon,124.0,,129.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,BKK_Sukhumvit,Watermelon,105.0,,109.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,BKK_Sukhumvit,Watermelon,110.0,,114.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,BKK_Sukhumvit,Watermelon,120.0,,124.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,BKK_Sukhumvit,Watermelon,112.0,,117.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,BKK_Sukhumvit,Watermelon,123.0,,127.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Beach,Guava,52.0,,55.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Beach,Guava,52.0,,55.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Beach,Guava,56.0,,59.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Beach,Guava,64.0,,67.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Beach,Guava,58.0,,61.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Beach,Guava,48.0,,51.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Beach,Guava,67.0,,70.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Beach,MixedBerryPremium,16.0,,15.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Beach,MixedBerryPremium,18.0,,16.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Beach,MixedBerryPremium,19.0,,17.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Beach,MixedBerryPremium,18.0,,16.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Beach,MixedBerryPremium,18.0,,16.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Beach,MixedBerryPremium,28.0,,25.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Beach,MixedBerryPremium,25.0,,23.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Beach,PassionFruit,41.0,,39.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Beach,PassionFruit,39.0,,37.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Beach,PassionFruit,42.0,,40.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Beach,PassionFruit,56.0,,53.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Beach,PassionFruit,45.0,,43.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Beach,PassionFruit,55.0,,53.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Beach,PassionFruit,67.0,,64.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Beach,Pineapple,83.0,,87.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Beach,Pineapple,93.0,,97.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Beach,Pineapple,95.0,,99.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Beach,Pineapple,108.0,,112.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Beach,Pineapple,78.0,,82.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Beach,Pineapple,103.0,,107.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Beach,Pineapple,131.0,,135.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Beach,Watermelon,138.0,,143.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Beach,Watermelon,105.0,,110.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Beach,Watermelon,117.0,,121.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Beach,Watermelon,114.0,,119.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Beach,Watermelon,126.0,,131.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Beach,Watermelon,131.0,,136.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Beach,Watermelon,165.0,,170.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Central,Guava,63.0,,67.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Central,Guava,60.0,,64.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Central,Guava,90.0,,94.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Central,Guava,47.0,,51.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Central,Guava,80.0,,85.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Central,Guava,71.0,,75.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Central,Guava,100.0,,104.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Central,MixedBerryPremium,22.0,,18.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Central,MixedBerryPremium,19.0,,16.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Central,MixedBerryPremium,21.0,,18.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Central,MixedBerryPremium,15.0,,13.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Central,MixedBerryPremium,20.0,,17.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Central,MixedBerryPremium,27.0,,24.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Central,MixedBerryPremium,27.0,,23.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Central,PassionFruit,44.0,,42.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Central,PassionFruit,40.0,,38.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Central,PassionFruit,50.0,,47.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Central,PassionFruit,47.0,,45.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Central,PassionFruit,47.0,,45.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Central,PassionFruit,62.0,,59.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Central,PassionFruit,73.0,,70.0,,,,,,CR + 0.1 quantile,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Central,Pineapple,99.0,,104.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Central,Pineapple,116.0,,121.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Central,Pineapple,106.0,,111.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Central,Pineapple,107.0,,112.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Central,Pineapple,104.0,,109.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Central,Pineapple,126.0,,131.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Central,Pineapple,138.0,,143.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0
+2026-09,Pattaya_Central,Watermelon,161.0,,167.0,,,,,,today's prep,"weekday (Sep 2026, per day)",0.0
+2026-09,Pattaya_Central,Watermelon,137.0,,143.0,,,,,,today's prep,"weekday (Sep 2026, per day)",1.0
+2026-09,Pattaya_Central,Watermelon,141.0,,146.0,,,,,,today's prep,"weekday (Sep 2026, per day)",2.0
+2026-09,Pattaya_Central,Watermelon,150.0,,156.0,,,,,,today's prep,"weekday (Sep 2026, per day)",3.0
+2026-09,Pattaya_Central,Watermelon,131.0,,136.0,,,,,,today's prep,"weekday (Sep 2026, per day)",4.0
+2026-09,Pattaya_Central,Watermelon,162.0,,168.0,,,,,,today's prep,"weekday (Sep 2026, per day)",5.0
+2026-09,Pattaya_Central,Watermelon,201.0,,207.0,,,,,,today's prep,"weekday (Sep 2026, per day)",6.0

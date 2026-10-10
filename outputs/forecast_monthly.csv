@@ -1,0 +1,61 @@
+month,kitchen,sku,forecast,how,cups_2025,gap_vs_2025_pct
+2026-09,BKK_Ladprao,Guava,1132.0,seasonal_naive,1034.0,9.477756286266924
+2026-09,BKK_Ladprao,MixedBerryPremium,355.0,flat 4-week weekday mean,,
+2026-09,BKK_Ladprao,PassionFruit,751.0,seasonal_naive,772.0,-2.720207253886009
+2026-09,BKK_Ladprao,Pineapple,1551.0,seasonal_naive,1693.0,-8.38747784997047
+2026-09,BKK_Ladprao,Watermelon,2459.0,seasonal_naive,2462.0,-0.12185215272136896
+2026-09,BKK_Sukhumvit,Guava,1609.0,seasonal_naive,1725.0,-6.724637681159418
+2026-09,BKK_Sukhumvit,MixedBerryPremium,609.75,flat 4-week weekday mean,,
+2026-09,BKK_Sukhumvit,PassionFruit,1260.0,seasonal_naive,1381.0,-8.76176683562636
+2026-09,BKK_Sukhumvit,Pineapple,2611.0,seasonal_naive,2720.0,-4.0073529411764675
+2026-09,BKK_Sukhumvit,Watermelon,4021.0,seasonal_naive,4093.0,-1.7591009039824135
+2026-09,Pattaya_Beach,Guava,1696.0,seasonal_naive,1894.0,-10.454065469904961
+2026-09,Pattaya_Beach,MixedBerryPremium,718.25,flat 4-week weekday mean,,
+2026-09,Pattaya_Beach,PassionFruit,1613.0,seasonal_naive,1462.0,10.328317373461005
+2026-09,Pattaya_Beach,Pineapple,2982.0,seasonal_naive,3056.0,-2.4214659685863893
+2026-09,Pattaya_Beach,Watermelon,4409.0,seasonal_naive,4585.0,-3.838604143947655
+2026-09,Pattaya_Central,Guava,2207.0,seasonal_naive,2200.0,0.31818181818181746
+2026-09,Pattaya_Central,MixedBerryPremium,773.25,flat 4-week weekday mean,,
+2026-09,Pattaya_Central,PassionFruit,1707.0,seasonal_naive,1805.0,-5.429362880886424
+2026-09,Pattaya_Central,Pineapple,3436.0,seasonal_naive,3485.0,-1.40602582496413
+2026-09,Pattaya_Central,Watermelon,5342.0,seasonal_naive,5373.0,-0.5769588684161553
+2026-10,BKK_Ladprao,Guava,1196.0504149248143,Sep x 2025 month ratio,1083.0,10.438634803768633
+2026-10,BKK_Ladprao,MixedBerryPremium,373.5,flat 4-week weekday mean,,
+2026-10,BKK_Ladprao,PassionFruit,774.9481865284974,Sep x 2025 month ratio,806.0,-3.852582316563591
+2026-10,BKK_Ladprao,Pineapple,1579.3354038450545,Sep x 2025 month ratio,1729.0,-8.656136272697834
+2026-10,BKK_Ladprao,Watermelon,2472.8778071853462,Sep x 2025 month ratio,2471.0,0.07599381567569008
+2026-10,BKK_Sukhumvit,Guava,1638.7758765778403,Sep x 2025 month ratio,1779.0,-7.88218793828891
+2026-10,BKK_Sukhumvit,MixedBerryPremium,637.25,flat 4-week weekday mean,,
+2026-10,BKK_Sukhumvit,PassionFruit,1223.5194225783093,Sep x 2025 month ratio,1363.0,-10.233351241503353
+2026-10,BKK_Sukhumvit,Pineapple,2740.3487903225805,Sep x 2025 month ratio,2839.0,-3.4748576850094914
+2026-10,BKK_Sukhumvit,Watermelon,4138.812606889812,Sep x 2025 month ratio,4216.0,-1.8308205196913674
+2026-10,Pattaya_Beach,Guava,1824.3509214156759,Sep x 2025 month ratio,2031.0,-10.174745375889916
+2026-10,Pattaya_Beach,MixedBerryPremium,751.0,flat 4-week weekday mean,,
+2026-10,Pattaya_Beach,PassionFruit,1750.0944353735492,Sep x 2025 month ratio,1558.0,12.32955297647942
+2026-10,Pattaya_Beach,Pineapple,2945.451781793616,Sep x 2025 month ratio,3016.0,-2.3391319033946867
+2026-10,Pattaya_Beach,Watermelon,4400.344742674218,Sep x 2025 month ratio,4550.0,-3.2891265346325804
+2026-10,Pattaya_Central,Guava,2273.5161290322585,Sep x 2025 month ratio,2292.0,-0.8064516129032029
+2026-10,Pattaya_Central,MixedBerryPremium,800.25,flat 4-week weekday mean,,
+2026-10,Pattaya_Central,PassionFruit,1730.2325082655707,Sep x 2025 month ratio,1812.0,-4.512554731480645
+2026-10,Pattaya_Central,Pineapple,3698.801314388855,Sep x 2025 month ratio,3750.0,-1.3652982829638671
+2026-10,Pattaya_Central,Watermelon,5292.729417697808,Sep x 2025 month ratio,5311.0,-0.3440139766935135
+2026-11,BKK_Ladprao,Guava,1219.563829787234,Sep x 2025 month ratio,1113.0,9.57446808510638
+2026-11,BKK_Ladprao,MixedBerryPremium,360.25,flat 4-week weekday mean,,
+2026-11,BKK_Ladprao,PassionFruit,919.3989637305699,Sep x 2025 month ratio,954.0,-3.626943005181349
+2026-11,BKK_Ladprao,Pineapple,1628.7341996455996,Sep x 2025 month ratio,1771.0,-8.033077377436504
+2026-11,BKK_Ladprao,Watermelon,2820.857432981316,Sep x 2025 month ratio,2797.0,0.8529650690495494
+2026-11,BKK_Sukhumvit,Guava,1770.3060869565218,Sep x 2025 month ratio,1911.0,-7.362318840579707
+2026-11,BKK_Sukhumvit,MixedBerryPremium,605.5,flat 4-week weekday mean,,
+2026-11,BKK_Sukhumvit,PassionFruit,1413.1245474293992,Sep x 2025 month ratio,1555.0,-9.123823316437353
+2026-11,BKK_Sukhumvit,Pineapple,3058.2812499999995,Sep x 2025 month ratio,3145.0,-2.757352941176483
+2026-11,BKK_Sukhumvit,Watermelon,4768.260933300758,Sep x 2025 month ratio,4838.0,-1.4414854629855811
+2026-11,Pattaya_Beach,Guava,1947.6383315733897,Sep x 2025 month ratio,2161.0,-9.873284054910236
+2026-11,Pattaya_Beach,MixedBerryPremium,724.5,flat 4-week weekday mean,,
+2026-11,Pattaya_Beach,PassionFruit,2081.28317373461,Sep x 2025 month ratio,1852.0,12.380300957592327
+2026-11,Pattaya_Beach,Pineapple,3469.633507853403,Sep x 2025 month ratio,3525.0,-1.5706806282722585
+2026-11,Pattaya_Beach,Watermelon,5193.427262813522,Sep x 2025 month ratio,5288.0,-1.7884405670665182
+2026-11,Pattaya_Central,Guava,2527.7727272727275,Sep x 2025 month ratio,2505.0,0.909090909090926
+2026-11,Pattaya_Central,MixedBerryPremium,782.75,flat 4-week weekday mean,,
+2026-11,Pattaya_Central,PassionFruit,2073.082548476454,Sep x 2025 month ratio,2153.0,-3.7119113573407247
+2026-11,Pattaya_Central,Pineapple,4121.395121951219,Sep x 2025 month ratio,4162.0,-0.9756097560975729
+2026-11,Pattaya_Central,Watermelon,6421.083193746511,Sep x 2025 month ratio,6342.0,1.2469756188349335
