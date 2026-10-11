@@ -56,14 +56,15 @@ def test_page_and_controls_run(page):
     assert not at.exception, page
     assert not at.warning, page
     assert at.title[0].value == common.PAGES[page].question, "page title = the question it answers"
-    # Every control: pick its last option and run again.
+    # Every control: try each option in turn, so no filter can leave a page empty or crash it.
     for kind in ["selectbox", "pills", "segmented_control"]:
         for i in range(len(getattr(at, kind))):
             box = getattr(at, kind)[i]
-            last = box.options[-1] if kind == "selectbox" else box.proto.options[-1].content
-            box.set_value(last)
-            at.run()
-            assert not at.exception, f"{page}: {kind} {box.label} = {last}"
+            options = box.options if kind == "selectbox" else [o.content for o in box.proto.options]
+            for option in options:
+                getattr(at, kind)[i].set_value(option)
+                at.run()
+                assert not at.exception, f"{page}: {kind} {box.label} = {option}"
 
 
 @pytest.mark.parametrize("page", PAGES)
