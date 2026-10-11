@@ -99,6 +99,24 @@ with right:
             c.table(lv.reset_index().assign(step=lambda d: d["step"].map(c.promo), kind=lambda d: d["kind"].map(
                 c.title_case)), money=[LOW, HIGH], name="scenario_levers", raw=lv.reset_index())
 
+be = c.breakeven_by_kitchen()
+bkk = be[be["kitchen"].str.startswith("BKK")]
+pattaya = be[be["kitchen"].str.startswith("Pattaya")]
+with c.card(f"To stay profitable, Bangkok must cut about {c.thb(bkk['cut_needed'].sum())} a month of overhead; "
+            f"Pattaya is within {c.thb(pattaya['cut_needed'].max())} a month of break-even",
+            so_what=f"the actions bring Pattaya close to 0 even in the low season. Bangkok needs its own target: "
+                    + c.join(f"{r.kitchen} cuts {c.thb(r.cut_needed)} a month ({c.pct(r.cut_pct, 0)} of its overhead)"
+                             for r in bkk.itertuples())
+                    + ". The overhead review that starts "
+                    + (f"{rec.loc['Kitchens', 'start_date']} " if "Kitchens" in rec.index else "")
+                    + "should test these targets; if rent and staff hours cannot move that far, the next question is "
+                      "merging or closing a Bangkok kitchen.",
+            how_to_read=f"Action scenario, average month of {horizon}. Overhead cut to break even = how much the "
+                        "kitchen's fixed overhead must fall for its operating profit to reach 0. It assumes sales and "
+                        "gross profit stay as in the Action plan."):
+    c.table(be, money=["gp_month", "overhead_month", "op_month", "cut_needed"], pcts=["cut_pct"],
+            highlight=be["cut_needed"].gt(be["overhead_month"] * 0.1), name="breakeven_by_kitchen")
+
 plan = pp.assign(action=pp["action"].map(c.promo), stop_rule=pp["stop_rule"].map(c.promo))
 with c.card(f"Who does what, by when: {pp['in_model'].sum()} actions in the model, {(~pp['in_model']).sum()} tests "
             "and reviews on top",

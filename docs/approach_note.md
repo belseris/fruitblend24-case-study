@@ -55,13 +55,31 @@ One model per month x kitchen x item, so no lever is counted twice. Sep-Nov oper
 
 The 4 actions add ฿92k to ฿118k a month (elasticity -1.5 to -0.5). Even so, low-season sales do not cover the ฿670k
 monthly overhead: Action still loses about ฿136k a month. Breaking even needs costs ฿136k a month lower, 40% of the
-฿340k Bangkok overhead, while the overhead review is sized at up to ฿51.7k. That gap is the next decision. Keeping
-berry at 99 THB with the prep rule and a stop rule beats delisting it now.
+฿340k Bangkok overhead, while the overhead review is sized at up to ฿51.7k. Per kitchen, the Pattaya kitchens are
+within ฿3k a month of break-even after the actions; Ladprao must cut ฿63k a month (45% of its overhead) and
+Sukhumvit ฿68k (34%). That is the plan to stay profitable: the 4 actions now, and these Bangkok targets in the
+overhead review (merge or close a kitchen if rent and staff hours cannot move that far). Keeping berry at 99 THB
+with the prep rule and a stop rule beats delisting it now.
+
+## Tools
+
+Python 3 with pandas (cleaning, P&L, reconciles), statsmodels (price elasticity, Holt-Winters), scipy (newsvendor
+rule), Plotly and Streamlit (the app), openpyxl (the Excel P&L with live formulas) and pytest (app tests). Notebooks
+01-06 hold the analysis; `src/` holds the shared code, so the notebooks and the app use the same functions.
 
 ## Limits
 
 No sold-out log (today's prep looks better than it is; lost repeat customers are not costed), few promo days per code, berry has no last year, waste has no
 platform split, and there are no grams per cup. Each limit and every judgment call is in `docs/decisions.md`.
+
+## What I would explore with more time
+
+- A sold-out log (item, time, cups) in every kitchen, then re-test the prep rule on the cheap items.
+- The price and promo tests against a control kitchen, read weekly against the stop rules.
+- Grams per cup, supplier prices and an overhead split per kitchen, to turn the plan into a fruit purchase plan and
+  size the Bangkok options (cut, merge or close).
+- Orders, not only cups, per platform: basket size and repeat customers would show what a sold-out or a promo really
+  costs.
 
 ## How to check my numbers
 

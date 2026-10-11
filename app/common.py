@@ -18,7 +18,7 @@ XLSX = OUT / "FruitBlend24_PnL.xlsx"
 APP_NAME = "FruitBlend24 Analysis"
 AUTHOR = "Ratthapak Sinsiri"
 GITHUB_URL = "https://github.com/belseris/fruitblend24-case-study"
-LIVE_APP_URL = ""  # TODO: paste the Streamlit Cloud link after the first deploy.
+LIVE_APP_URL = "https://fruitblend24.streamlit.app"
 
 ITEMS = ["Watermelon", "Pineapple", "Guava", "PassionFruit", "MixedBerryPremium"]
 KITCHENS = ["Pattaya_Central", "Pattaya_Beach", "BKK_Sukhumvit", "BKK_Ladprao"]
@@ -75,6 +75,8 @@ NAMES = {
     "waste_cups": "Wasted (cups)", "short_cups": "Short (cups)", "fruit_budget_thb": "Fruit budget",
     "thb_per_month_waste": "Waste a month", "elasticity_-1.5": "฿ a month (elasticity -1.5)",
     "elasticity_-0.5": "฿ a month (elasticity -0.5)", "examples": "Examples", "revenue": "Revenue",
+    "gp_month": "Gross profit a month", "overhead_month": "Overhead a month", "op_month": "Operating profit a month",
+    "cut_needed": "Overhead cut to break even", "cut_pct": "Cut as % of overhead",
 }
 
 
@@ -122,6 +124,20 @@ def action_gap() -> dict:
     return {"company_month": company, "bkk_month": bkk_gp / n - bkk_oh, "bkk_overhead": bkk_oh,
             "share_of_bkk_overhead": -company / bkk_oh * 100 if bkk_oh else float("nan"),
             "review_high": review.get("Kitchens", float("nan"))}
+
+
+@st.cache_data
+def breakeven_by_kitchen(scenario: str = "Action") -> pd.DataFrame:
+    """Per kitchen, a month in the forecast months: gross profit, overhead, and the overhead cut that reaches 0."""
+    sc = load("scenarios")
+    months = load("scenario_summary")["month"].nunique()
+    gp = sc[sc["scenario"] == scenario].groupby("kitchen")["gross_profit"].sum() / months
+    overhead = load("kitchen_pnl").groupby("kitchen")["overhead"].mean()
+    t = pd.DataFrame({"gp_month": gp, "overhead_month": overhead}).reindex(KITCHENS)
+    t["op_month"] = t["gp_month"] - t["overhead_month"]
+    t["cut_needed"] = (-t["op_month"]).clip(lower=0)
+    t["cut_pct"] = t["cut_needed"] / t["overhead_month"] * 100
+    return t.rename_axis("kitchen").reset_index()
 
 
 def approach_note() -> tuple[Path, str] | None:
@@ -219,7 +235,14 @@ def last_updated() -> str:
 
 def promo(text: str) -> str:
     """Write promo codes with their names: RC101 -> Bundle (RC101). Safe to call twice."""
-    return re.sub(r"(?<!\()\bRC10[123]\b", lambda m: PROMO[m.group()], str(text))
+    text = str(text)
+
+    def name(m):
+        code = m.group()
+        named = PROMO[code].removesuffix(f"{code})")  # 'Bundle (': the code already has its name
+        return code if text[:m.start()].endswith(named) else PROMO[code]
+
+    return re.sub(r"\bRC10[123]\b", name, text)
 
 
 def short_item(s: str) -> str:
@@ -342,7 +365,7 @@ def _draw(df: pd.DataFrame, money, pcts, count, per_cup, dec, exact, highlight, 
     for col in df.columns[df.dtypes == bool]:
         df[col] = df[col].map({True: "Yes", False: "No"})
     text = df.select_dtypes(exclude="number").columns
-    df[text] = df[text].fillna("")
+    df[text] = df[text].fillna("").map(promo)  # promo codes always with their names
     fmt = {**{col: thb for col in money}, **{col: pct for col in pcts}, **{col: "{:,.0f}".format for col in count},
            **{col: baht for col in per_cup}, **{col: "{:,.2f}".format for col in dec},
            **{col: thb_full for col in exact}}

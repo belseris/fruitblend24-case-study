@@ -83,8 +83,9 @@ def test_no_snake_case_on_screen(page):
         names = [str(x) for x in df.columns] + [str(x) for x in df.index.names if x]
         assert not [n for n in names if "_" in n], f"{page}: {names}"
     # Promo codes always carry their name: 'Bundle (RC101)', never a bare 'RC101'.
-    for text in screen_text(at):
-        assert not re.search(r"(?<!\()\bRC10[123]\b", text), f"{page}: bare promo code in '{text[:80]}'"
+    cells = [str(v) for df in tables(at) for v in df.select_dtypes(exclude="number").to_numpy().ravel()]
+    for text in screen_text(at) + cells:
+        assert common.promo(text) == text, f"{page}: bare promo code in '{text[:80]}'"
 
 
 def test_kpis_equal_company_pnl():
@@ -137,6 +138,7 @@ def test_money_format():
     assert common.pct(24.517) == "24.5%"
     assert common.pts(1.234) == "+1.2 pts"
     assert common.promo("RC101 and Double day (RC102)") == "Bundle (RC101) and Double day (RC102)"
+    assert common.promo("lift (RC102: 1.75)") == "lift (Double day (RC102): 1.75)"
     assert common.join([]) == "none" and common.span([]) == ""
 
 

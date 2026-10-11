@@ -68,7 +68,7 @@ with c.card(f"Decision log: {len(d)} judgment calls, each with a reason and an i
         shown = shown[hit]
     st.caption(f"{len(shown)} of {len(d)} decisions. Source: docs/decisions.md (Step = step of the case study, 1 to 14). "
                "Click a row to read it in full below the table.")
-    sel = st.dataframe(shown, hide_index=True, on_select="rerun", selection_mode="single-row", key="am_table",
+    sel = st.dataframe(shown.map(c.promo), hide_index=True, on_select="rerun", selection_mode="single-row", key="am_table",
                        column_config={"Decision": st.column_config.TextColumn(width="large"),
                                       "Reason": st.column_config.TextColumn(width="large"),
                                       "Impact": st.column_config.TextColumn(width="medium")})
@@ -76,7 +76,7 @@ with c.card(f"Decision log: {len(d)} judgment calls, each with a reason and an i
     if len(shown):
         one = shown.iloc[rows[0] if rows else 0]
         st.markdown(f"**{'Selected' if rows else 'First'} decision (step {one['Step']}, {one['Date']})**")
-        st.table(one[["Decision", "Reason", "Impact"]].to_frame(), border="horizontal", hide_header=True)
+        st.table(one[["Decision", "Reason", "Impact"]].map(c.promo).to_frame(), border="horizontal", hide_header=True)
     c.download(shown, "decisions")
 
 # ---- how the numbers are built ----

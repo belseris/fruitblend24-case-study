@@ -6,7 +6,7 @@ Gross profit (GP) = revenue after discount - platform commission - fruit - packa
 ## Bottom line
 
 FruitBlend24 lost 404k THB after kitchen overhead in the last 12 months and missed its GP budget by 764k (-9.1%): berry and PassionFruit earn below the budget margin, and the two Bangkok kitchens do not cover their overhead. The GP definition matters: before waste (GP-B) the year is +97k vs budget. We use GP-C because waste is a real cost and the budget note does not leave it out.
-Four actions add 92k to 118k THB a month and cut the Sep-Nov loss from 685k to about 408k. That still leaves about 136k a month: to break even, costs must fall by 40% of the 340k monthly Bangkok overhead, more than the overhead review is sized for (up to 51.7k).
+Four actions add 92k to 118k THB a month and cut the Sep-Nov loss from 685k to about 408k. That still leaves about 136k a month: to break even, costs must fall by 40% of the 340k monthly Bangkok overhead, more than the overhead review is sized for (up to 51.7k). Per kitchen: Pattaya is within 3k a month of break-even after the actions; Ladprao must cut 63k a month (45% of its overhead) and Sukhumvit 68k (34%), or the next question is merging or closing a Bangkok kitchen.
 
 ## Five insights
 

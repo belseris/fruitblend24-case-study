@@ -3,7 +3,7 @@
 Analyst case study for Atmind Group (Revenue / Data Analyst Intern): 12 months of smoothie orders turned into a P&L,
 a budget gap analysis, price and promo decisions, a Sep-Nov forecast and a costed action plan.
 
-**Live app:** _link added after the first deploy on Streamlit Community Cloud_
+**Live app:** [fruitblend24.streamlit.app](https://fruitblend24.streamlit.app)
 
 ## Key findings
 
