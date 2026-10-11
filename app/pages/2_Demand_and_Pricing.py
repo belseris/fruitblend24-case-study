@@ -163,7 +163,7 @@ with right:
 # ---- elasticity and price decisions ----
 main = el[el["estimate"].str.startswith("1")].set_index("sku").reindex(c.ITEMS)
 be = prs["breakeven_elasticity"].reindex(c.ITEMS)
-# Same split as the lesson-6 decisions: a new list price now, or a test price first.
+# Same split as the step-6 decisions: a new list price now, or a test price first.
 room = [s for s in c.ITEMS if prs.loc[s, "new_price"] > prs.loc[s, "price_now"]]
 cross = [s for s in c.ITEMS if pd.notna(prs.loc[s, "test_price"])]
 
@@ -235,7 +235,7 @@ with right:
         c.table(ptbl, cols=["Item", "Price now", "Decision", "New price", "Profit a month"],
                 highlight=pr["decision"].eq("raise"), name="price_recommendation", raw=pr)
         with st.expander("Why: main risk and the reason in the decision log"):
-            log = c.decisions().query("Lesson == '6'")
+            log = c.decisions().query("Step == '6'")
             for _, r in pr.iterrows():
                 key = "Platform pricing" if "(" in r["sku"] else r["sku"]
                 row = log[log["Decision"].str.startswith(f"{key}:")]

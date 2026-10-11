@@ -100,13 +100,28 @@ def read_bytes(path: Path) -> bytes:
 
 @st.cache_data
 def decisions() -> pd.DataFrame:
-    """The decision table in docs/decisions.md as a frame."""
+    """The decision table in docs/decisions.md as a frame. The file's 'Lesson' column is shown as 'Step'."""
     rows = []
     for line in read_doc("decisions.md").splitlines():
         if line.startswith("| 20"):
             cells = [x.strip() for x in line.strip().strip("|").split(" | ")]
             rows.append(cells[:5])
-    return pd.DataFrame(rows, columns=["Date", "Lesson", "Decision", "Reason", "Impact"])
+    return pd.DataFrame(rows, columns=["Date", "Step", "Decision", "Reason", "Impact"])
+
+
+@st.cache_data
+def action_gap() -> dict:
+    """Sep-Nov after all actions: what is still lost a month, for the company and for Bangkok."""
+    ss, sc = load("scenario_summary"), load("scenarios")
+    overhead = load("kitchen_pnl").groupby("kitchen")["overhead"].mean()
+    n = ss["month"].nunique()
+    bkk_oh = overhead.filter(like="BKK").sum()
+    bkk_gp = sc[(sc["scenario"] == "Action") & sc["kitchen"].str.startswith("BKK")]["gross_profit"].sum()
+    company = ss.loc[ss["scenario"] == "Action", "operating_profit"].sum() / n
+    review = load("recommendations").set_index("area").get("thb_month_high", pd.Series(dtype=float))
+    return {"company_month": company, "bkk_month": bkk_gp / n - bkk_oh, "bkk_overhead": bkk_oh,
+            "share_of_bkk_overhead": -company / bkk_oh * 100 if bkk_oh else float("nan"),
+            "review_high": review.get("Kitchens", float("nan"))}
 
 
 def approach_note() -> tuple[Path, str] | None:
@@ -270,7 +285,9 @@ def next_page(page: str, label: str | None = None) -> None:
 def card(title: str, so_what: str | None = None, how_to_read: str | None = None, method: str | None = None):
     """A bordered card: finding as the title, help in popovers, 'So what' at the bottom."""
     with st.container(border=True):
-        with st.container(horizontal=True, vertical_alignment="top", gap="small", wrap=False):
+        # A wrapping row: the title takes the full width and the help buttons sit on the right under it.
+        # A no-wrap row would squeeze the title and show a scrollbar in narrow cards.
+        with st.container(horizontal=True, horizontal_alignment="right", vertical_alignment="center", gap="small"):
             st.markdown(f"**{title}**", width="stretch")
             if how_to_read:
                 with st.popover("How to read"):

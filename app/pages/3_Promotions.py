@@ -10,6 +10,7 @@ inc = c.load("promo_incremental")
 dec = c.load("promo_decision")
 ws = c.load("waste_summary")
 months = c.load("company_pnl")["month"].nunique()
+levers = c.load("scenario_levers").set_index("step")["elasticity_-1.5"]
 
 codes = inc[inc["level"] == "code"].set_index("code")
 net_month = codes["net"] / months
@@ -30,10 +31,13 @@ c.page_header(
 c.kpi_row([
     dict(label="Promo loss a month", value=c.thb(net_month.sum()),
          series=[net_month.get(k, 0) for k in c.PROMO],
-         help="Net profit of all promo codes vs normal days, after extra waste and side effects, a month."),
+         help="Net profit of all promo codes vs normal days, after extra waste and side effects. Average month "
+              f"over {c.data_period()}."),
     dict(label="Saving if Kill rows stop", value=c.thb(kill["kill_saving"].sum()),
          delta=f"{len(kill)} of {len(dec)} rows", delta_color="off", delta_arrow="off",
-         help="Profit a month we get back by stopping the promo rows marked Kill (at the new prices)."),
+         help="Profit a month we get back by stopping the promo rows marked Kill, at the new prices, average month "
+              f"over {c.data_period()}. In the Sep-Nov model the same stop is worth "
+              f"{c.thb(levers.filter(like='Kill').iloc[0])} a month (Action plan page)."),
     dict(label="Upside if tests pass", value=c.sthb(modify["modify_net"].sum()),
          delta=f"range {c.thb(modify['modify_low'].sum())} to {c.thb(modify['modify_high'].sum())}",
          delta_color="off", delta_arrow="off",
@@ -92,7 +96,8 @@ with right:
     fig.update_yaxes(title="Net profit a month (฿)", range=[lo, 0], **c.money_ticks(lo, 0, 4))
     with c.card(f"All {len(net_month)} codes lose money: {c.thb(net_month.sum())} a month; {c.promo(worst)} "
                 "loses the most",
-                so_what=f"stopping every code would add about {c.thb(-net_month.sum())} a month; the decision table "
+                so_what=f"stopping every code would add about {c.thb(-net_month.sum())} a month (average month of "
+                        "the year); the decision table "
                         "keeps the versions that a small change could turn positive.",
                 how_to_read="Start from the profit the promo days earned. Take away what the same hours would have "
                             "earned on a normal day at full price (the baseline cups). Add the extra waste on promo "
@@ -148,8 +153,8 @@ fig.add_bar(x=names, y=pw[("wasted_per_kitchen_day", "True")], name="Promo day",
 fig.update_yaxes(title="Cups wasted per kitchen a day")
 with c.card(f"Promo days waste {more.min():.0f}-{more.max():.0f}% more cups, but the waste rate moves less than "
             f"{rate_gap:.1f} points",
-            so_what="kitchens already prep more on promo days, and they sell more too. Extra waste cost vs comparable "
-                    "normal days: " + ", ".join(f"{c.promo(k)} {c.thb(-v)} a year" for k, v in codes["waste"].items())
+            so_what="promo days waste more cups because they sell more cups; the waste rate barely moves. Extra waste "
+                    "cost vs comparable normal days: " + ", ".join(f"{c.promo(k)} {c.thb(-v)} a year" for k, v in codes["waste"].items())
                     + ". When a promo stops, prep must come down with it."):
     c.show(fig, height=320, legend=True)
     wtbl = pd.DataFrame({"Item": pw.index,

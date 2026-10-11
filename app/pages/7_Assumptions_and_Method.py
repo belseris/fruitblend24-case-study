@@ -59,14 +59,14 @@ with c.card(f"Decision log: {len(d)} judgment calls, each with a reason and an i
             so_what="every number in the app can be traced to a choice written down here, with its date and step."):
     left, right = st.columns([3, 1])
     term = left.text_input("Search decisions", placeholder="e.g. berry, waste, RC102, overhead", key="am_search")
-    lessons = sorted(d["Lesson"].unique(), key=lambda x: int(x) if x.isdigit() else 99)
+    steps = sorted(d["Step"].unique(), key=lambda x: int(x) if x.isdigit() else 99)
     with right:
-        lesson = c.choose("Lesson", lessons, key="am_lesson")
-    shown = d if lesson == "All" else d[d["Lesson"] == lesson]
+        step = c.choose("Step", steps, key="am_step")
+    shown = d if step == "All" else d[d["Step"] == step]
     if term:
         hit = shown.apply(lambda col: col.str.contains(term, case=False, regex=False)).any(axis=1)
         shown = shown[hit]
-    st.caption(f"{len(shown)} of {len(d)} decisions. Source: docs/decisions.md (Lesson = step of the case study). "
+    st.caption(f"{len(shown)} of {len(d)} decisions. Source: docs/decisions.md (Step = step of the case study, 1 to 14). "
                "Click a row to read it in full below the table.")
     sel = st.dataframe(shown, hide_index=True, on_select="rerun", selection_mode="single-row", key="am_table",
                        column_config={"Decision": st.column_config.TextColumn(width="large"),
@@ -75,7 +75,7 @@ with c.card(f"Decision log: {len(d)} judgment calls, each with a reason and an i
     rows = sel.selection.rows if sel else []
     if len(shown):
         one = shown.iloc[rows[0] if rows else 0]
-        st.markdown(f"**{'Selected' if rows else 'First'} decision (lesson {one['Lesson']}, {one['Date']})**")
+        st.markdown(f"**{'Selected' if rows else 'First'} decision (step {one['Step']}, {one['Date']})**")
         st.table(one[["Decision", "Reason", "Impact"]].to_frame(), border="horizontal", hide_header=True)
     c.download(shown, "decisions")
 
@@ -120,7 +120,9 @@ bias = fb[fb["test"].str.startswith("Jun-Aug") & (fb["sku"] == "All")]["bias_pct
 normal = pc.loc[pc.index.str.contains("normal")].iloc[0]
 with right, c.card("What the data cannot tell us"):
     st.markdown(c.promo(
-        "- **No sold-out data.** Sales show what was sold, not what customers wanted. Today's prep looks better than "
+        "- **No sold-out data.** Sales show what was sold, not what customers wanted. The prep rule plans to run out "
+        "on part of berry and PassionFruit demand, and a lost cup is costed as lost profit only (no lost repeat "
+        "customers or app ranking). Today's prep looks better than "
         "it is, and the prep rule's short cups are counted as lost sales.\n"
         f"- **Few promo days.** RC102 ran on only {dec.loc[dec['code'] == 'RC102', 'promo_days'].max()} days; "
         f"elasticities rest on {promo_days.min()}-{promo_days.max()} RC101 days per item. New customers from promos "

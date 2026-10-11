@@ -30,7 +30,8 @@ LOOK_FIRST = {
 def totals() -> dict:
     """Full-year totals for the KPI row, from company_pnl.csv and budget_variance.csv."""
     m, v = c.load("company_pnl"), c.load("budget_variance")
-    k = {col: m[col].sum() for col in ["gross_revenue", "gross_profit", "operating_profit", "waste_cost", "overhead"]}
+    k = {col: m[col].sum() for col in ["gross_revenue", "gross_profit", "gp_b", "operating_profit", "waste_cost",
+                                       "overhead"]}
     k["budget_revenue"], k["budget_gp"] = v["budget_revenue"].sum(), v["budget_gp"].sum()
     # The budget has no operating profit line, so use budget GP minus the same fixed overhead.
     k["budget_op"] = k["budget_gp"] - k["overhead"]
@@ -61,7 +62,8 @@ def kpi_row(k: dict) -> None:
              delta=f"{c.sthb(gp_gap)} ({c.spct(gp_gap / k['budget_gp'] * 100)})",
              series=m["gross_profit"],
              help="GP-C = revenue minus commission, fruit, packaging + labor and waste. "
-                  f"Budget {c.thb(k['budget_gp'])}."),
+                  f"Budget {c.thb(k['budget_gp'])}. Before waste (GP-B) the year would be "
+                  f"{c.sthb(k['gp_b'] - k['budget_gp'])} vs budget."),
         dict(label="GP %", value=c.pct(k["gp_pct"]), delta=c.pts(k["gp_pct"] - k["budget_gp_pct"]),
              series=m["gp_pct"],
              help=f"Gross profit (GP-C) as % of revenue. Budget {c.pct(k['budget_gp_pct'])}."),
@@ -104,6 +106,12 @@ def gp_vs_budget() -> None:
                         f"{c.thb(-v['margin_effect'].sum())}. Fixing the margin of "
                         f"{c.join(c.short_item(s) for s in big)} matters more than selling more."):
         c.show(fig, height=320, legend=True)
+        above = [c.month_short(mm) for mm in v.loc[~below, "month"]]
+        overhead = c.load("company_pnl")["overhead"].sum()
+        st.caption(f"The budget is flat at {c.thb(v['budget_revenue'].iloc[0])} revenue and "
+                   f"{c.thb(v['budget_gp'].iloc[0])} gross profit every month, so the misses follow the season "
+                   f"(only {c.join(above)} beat it). Even on budget, the year plans "
+                   f"{c.thb(v['budget_gp'].sum() - overhead)} operating profit after {c.thb(overhead)} overhead.")
 
 
 def actions() -> None:
@@ -131,6 +139,7 @@ def kitchens() -> None:
     """Operating profit by kitchen, Bangkok vs Pattaya."""
     kp = c.load("kitchen_pnl").groupby("kitchen")["operating_profit"].sum().sort_values()
     bkk, pattaya = kp.filter(like="BKK").sum(), kp.filter(like="Pattaya").sum()
+    gap = c.action_gap()
     fig = go.Figure(go.Bar(y=kp.index, x=kp, orientation="h", marker_color=c.colors(kp.index, kp.index[kp < 0], c.LOSS),
                            text=[c.thb(x) for x in kp], textposition=["inside" if x < 0 else "outside" for x in kp], cliponaxis=False,
                            customdata=[c.thb(x) for x in kp], hovertemplate="%{y}<br>%{customdata}<extra></extra>"))
@@ -139,8 +148,9 @@ def kitchens() -> None:
     lo, hi = min(kp.min(), 0) - width * 0.35, max(kp.max(), 0) + width * 0.45
     fig.update_xaxes(title="Operating profit, full year (฿)", range=[lo, hi], **c.money_ticks(lo, hi, 3))
     with c.card(f"Bangkok loses {c.thb(-bkk)} after overhead; Pattaya makes {c.thb(pattaya)}",
-                so_what="the price and waste fixes help every kitchen, but only an overhead review can bring "
-                        "Bangkok to break-even."):
+                so_what=f"even after all the price, promo and waste actions, Bangkok still loses about "
+                        f"{c.thb(-gap['bkk_month'])} a month in Sep-Nov; the overhead review is sized at up to "
+                        f"{c.thb(gap['review_high'])} a month, so it cannot close that alone."):
         c.show(fig, height=240)
 
 
@@ -179,8 +189,10 @@ def scorecard(k: dict) -> None:
     gaps = c.load("gp_bridge").set_index("step")["thb"]
     items = gaps[gaps.index.str.endswith("margin gap")].rename(lambda s: c.short_item(s.replace(" margin gap", "")))
     reached = k["gross_profit"] / k["budget_gp"]
+    below = items[items < 0]
     with c.card(f"Gross profit reached {c.pct(reached * 100)} of budget",
-                so_what="the gap is in a few places, so a few targeted fixes can close most of it."):
+                so_what=f"{c.join(below.index)} miss the budget margin by {c.thb(-below.sum())} together, more than "
+                        f"the whole {c.thb(k['budget_gp'] - k['gross_profit'])} gap; the other items are above it."):
         st.progress(min(max(reached, 0.0), 1.0), text=f"{c.thb(k['gross_profit'])} of {c.thb(k['budget_gp'])}")
         if len(kp):
             c.best_worst("kitchen", kp.idxmax(), c.sthb(kp.max()), kp.idxmin(), c.sthb(kp.min()))

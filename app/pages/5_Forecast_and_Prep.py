@@ -136,6 +136,8 @@ with right:
 
 # ---- prep plan ----
 mon = inv[inv["level"] == "month"]
+rule_rows = mon[mon["sku"].isin(rule_items)].groupby("sku")[["short_cups", "demand"]].sum()
+short = (rule_rows["short_cups"] / rule_rows["demand"]).reindex([x for x in c.ITEMS if x in rule_rows.index])
 plan = mon.pivot_table(index=["sku", "rule"], columns="month", values="prep_cups", aggfunc="sum")
 plan.columns = [c.month_name(m) for m in plan.columns]
 plan["Fruit budget"] = mon.groupby(["sku", "rule"])["fruit_budget_thb"].sum()
@@ -144,9 +146,12 @@ plan["rule"] = plan["rule"].map(c.title_case)
 months = [col for col in plan.columns if col not in ("sku", "rule", "Fruit budget")]
 with c.card(f"Prep {c.join(c.short_item(s) for s in rule_items)} lean; keep today's prep for the cheap items "
             "(highlighted rows use the new rule)",
-            so_what=f"fruit budget for {horizon}: {c.thb(mon['fruit_budget_thb'].sum())}, or "
-                    f"{c.thb(mon['fruit_budget_downside_thb'].sum())} if fruit costs rise. The plan is in cups and ฿ "
-                    "because the data has no grams per cup.",
+            so_what=f"the rule runs out on purpose: it leaves "
+                    + c.join(f"{c.pct(short[s_] * 100, 0)} of {c.short_item(s_)}" for s_ in short.index)
+                    + " demand unserved in Sep-Nov. A lost cup is costed as lost profit only; lost repeat customers "
+                    "and app ranking are not, so the stop rule watches sold-outs every week. Fruit budget for "
+                    f"{horizon}: {c.thb(mon['fruit_budget_thb'].sum())}, or {c.thb(mon['fruit_budget_downside_thb'].sum())} "
+                    "if fruit costs rise.",
             method="Prepared = sold + wasted (there is no prep log). Cu = profit per cup, Co = waste cost per "
                    "wasted cup, both from Jun-Aug. Prep = the CR + 0.1 quantile of the last 8 normal same-weekday "
                    "days, no look-ahead. On promo days, rule items prep the normal level x the measured promo "

@@ -27,7 +27,8 @@ c.page_header(
 c.kpi_row([
     dict(label="Gross profit vs budget", value=c.sthb(v["gp_var"].sum()), series=v["gp_var"],
          delta=c.spct(v["gp_var"].sum() / v["budget_gp"].sum() * 100), delta_description="of budget",
-         help="Actual gross profit (GP-C) minus budget gross profit, full year. Chart = by month."),
+         help="Actual gross profit (GP-C) minus budget gross profit, full year. Chart = by month. Before waste "
+              f"(GP-B) it would be {c.sthb(fy['gp_b'] - v['budget_gp'].sum())}."),
     dict(label="Revenue effect", value=c.sthb(v["revenue_effect"].sum()), series=v["revenue_effect"],
          help=f"Part of the gap from lower sales: revenue gap x budget margin ({c.pct(budget_margin)})."),
     dict(label="Margin effect", value=c.sthb(v["margin_effect"].sum()), series=v["margin_effect"],
@@ -109,10 +110,11 @@ with left:
     defs["% of revenue"] = defs["Full year"] / fy["gross_revenue"] * 100
     defs["Gap to budget"] = (defs["% of revenue"] - budget_margin).map(c.pts)
     a, b, gc = defs["% of revenue"]
-    with c.card(f"GP-C fits the {c.pct(budget_margin)} budget margin and counts waste",
-                so_what=f"GP-A ({c.pct(a)}) is far above the budget, so the budget is after commission. GP-B "
-                        f"({c.pct(b)}) and GP-C ({c.pct(gc)}) are both close; waste is a real cost and the budget "
-                        "note does not leave it out, so we use the lower and safer one, GP-C."):
+    gap_b, gap_c = fy["gp_b"] - v["budget_gp"].sum(), fy["gross_profit"] - v["budget_gp"].sum()
+    with c.card(f"The {c.pct(budget_margin)} budget margin sits between GP-C and GP-B; we use GP-C, the lower one",
+                so_what=f"the choice changes the headline: GP-B is {c.sthb(gap_b)} vs budget, GP-C is {c.sthb(gap_c)}. "
+                        f"GP-A ({c.pct(a)}) is far above, so the budget is after commission. We use GP-C because "
+                        "waste is a real cost of selling and the budget note does not leave it out."):
         c.table(defs, cols=["Definition", "% of revenue", "Gap to budget"], money=["Full year"], pcts=["% of revenue"],
                 highlight=defs["Definition"].str.contains("used"))
 
@@ -144,7 +146,8 @@ with right:
     fig.update_yaxes(title="Gross profit, full year (฿)", range=[lo, hi], **c.money_ticks(lo, hi))
     with c.card(f"{c.join(f'{k} ({c.thb(gaps[s])})' for k, s in zip(key, big))} cost more than the sales shortfall "
                 f"({c.thb(gaps['Revenue effect'])})",
-                so_what=f"selling more would not close the gap. The margin of {c.join(big_names)} must be fixed "
+                so_what=f"selling more closes at most {c.thb(-gaps['Revenue effect'])} of the "
+                        f"{c.thb(-v['gp_var'].sum())} gap. The margin of {c.join(big_names)} must be fixed "
                         "(price, fruit cost, waste); the other items are above the budget margin.",
                 how_to_read=f"Start on the left at the budget gross profit. Each bar in the middle moves it up or "
                             f"down; the label shows by how much. **Revenue effect** = sales below budget, valued at "
@@ -187,9 +190,9 @@ with left:
                         months_below_0=below.reindex(order.index)).reset_index()
     worst = order.index[0] if len(order) else ""
     with c.card(f"Bangkok kitchens lose {c.thb(-bkk)} after overhead; Pattaya kitchens make {c.thb(pattaya)}",
-                so_what=f"{worst} is below 0 in {below.get(worst, 0)} of {n_months} months. Price and waste fixes help "
-                        "every kitchen, but only an overhead review (rent, staff hours) can bring Bangkok to "
-                        "break-even."):
+                so_what=f"{worst} is below 0 in {below.get(worst, 0)} of {n_months} months. After all actions "
+                        f"Bangkok still loses about {c.thb(-c.action_gap()['bkk_month'])} a month in Sep-Nov, so "
+                        "its overhead (rent, staff hours) needs its own plan."):
         c.table(ktbl.rename(columns={"op_margin": "Operating margin", "months_below_0": "Months below 0"}),
                 cols=["kitchen", "gross_profit", "overhead", "operating_profit"],
                 money=["gross_revenue", "gross_profit", "overhead", "operating_profit"], pcts=["Operating margin"],

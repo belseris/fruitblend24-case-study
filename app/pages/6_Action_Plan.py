@@ -14,17 +14,24 @@ n_months = ss["month"].nunique()
 order = list(dict.fromkeys(ss["scenario"]))
 three = ss.groupby("scenario", sort=False)["operating_profit"].sum().reindex(order)
 overhead = ss.groupby("scenario", sort=False)["overhead"].sum().iloc[0]
+gap = c.action_gap()
+# Stress test from notebook 05: Action at the cautious end of the measured elasticity of each raised item.
+sc = c.load("scenarios")
+measured = sc[sc["scenario"] == "Action (measured elasticity)"]["gross_profit"].sum() - overhead
+pr = c.load("price_recommendation")
+raised = pr[pr["new_price"] > pr["price_now"]].set_index("sku")[["day_elasticity", "ci_low"]].min(axis=1)
 
 c.page_header(
     c.ACTION,
     f"**{horizon} operating profit: Base {c.thb(three.get('Base', 0))}, Action {c.thb(three.get('Action', 0))}, "
-    f"Downside {c.thb(three.get('Downside', 0))}.** Even with all actions the period loses money after overhead; "
-    "the rest needs a Bangkok overhead review.")
+    f"Downside {c.thb(three.get('Downside', 0))}.** Even with all actions it loses about "
+    f"{c.thb(-gap['company_month'])} a month after overhead, {c.pct(gap['share_of_bkk_overhead'], 0)} of Bangkok "
+    "overhead.")
 
 HELP = {"Base": "Today's prices, promos and prep.",
         "Action": "Price rises, stop the losing promos, the prep rule and berry at the higher price.",
         "Action + delist berry": "Action, and berry taken off the menu.",
-        "Downside": "Action with fruit cost up and demand down (sizes in the decision log, lesson 11)."}
+        "Downside": "Action with fruit cost up and demand down (sizes in the decision log, step 11)."}
 base = three.get("Base", 0)
 c.kpi_row([
     dict(label=s, value=c.thb(v), delta=None if s == "Base" else f"{c.sthb(v - base)} vs Base",
@@ -47,15 +54,20 @@ with left:
     month_cols = [col for col in stbl.columns if col not in ("Scenario", "GP %", "Revenue", "Waste cost")]
     gain = three.get("Action", 0) - base
     with c.card(f"The plan cuts the {horizon} loss by {c.thb(gain)}, but no scenario covers the overhead",
-                so_what=f"low-season sales do not cover the {c.thb(overhead / n_months)} monthly overhead. The "
-                        f"Bangkok overhead review ({rec.loc['Kitchens', 'start_date'] if 'Kitchens' in rec.index else 'Q4'}"
-                        ") is the gap that is left.",
+                so_what=f"to break even in {horizon}, costs must fall by about {c.thb(-gap['company_month'])} a month "
+                        f"more: {c.pct(gap['share_of_bkk_overhead'], 0)} of the {c.thb(gap['bkk_overhead'])} monthly "
+                        f"Bangkok overhead. The overhead review is sized at up to {c.thb(gap['review_high'])} a month, "
+                        "so it needs a bigger target, or a kitchen decision.",
                 method="One model per month x kitchen x item, so no lever is counted twice. Overhead is the same in "
-                       "every scenario. Price tests count as 0 until they pass. Downside = Action with fruit cost "
-                       "up and demand down."):
-        c.table(stbl, cols=["Scenario"] + month_cols + ["GP %"], pcts=["GP %"],
+                       "every scenario. Price tests count as 0 until they pass. Each action has its full effect from "
+                       "its start date (no ramp-up). Downside = Action with fruit cost up and demand down."):
+        c.table(stbl, cols=["Scenario", f"{n_months} months", "GP %"], pcts=["GP %"],
                 money=month_cols + ["Revenue", "Waste cost"], highlight=stbl["Scenario"].eq("Action"),
                 name="scenario_summary", raw=ss)
+        if len(raised):
+            st.caption(f"Stress test: at the cautious end of what we measured ("
+                       + c.join(f"{c.short_item(k)} {v:.2f}" for k, v in raised.items())
+                       + f") Action is {c.thb(measured)}, still {c.sthb((measured - base) / n_months)} a month vs Base.")
 
 with right:
     steps = lv[lv["kind"] == "change"][LOW]
