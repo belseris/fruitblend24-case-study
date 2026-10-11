@@ -33,7 +33,7 @@ def open_app(page: str | None = None) -> AppTest:
 def test_home_runs():
     at = open_app()
     assert not at.exception
-    assert at.title[0].value == "FruitBlend24: How to grow profit and cut waste"
+    assert at.title[0].value == common.HOME.question
     assert len(at.metric) == 5
     assert not at.warning
 
