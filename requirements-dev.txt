@@ -1,6 +1,4 @@
 -r requirements.txt
-pyarrow==25.0.1
-openpyxl==3.1.5
 scipy==1.18.1
 statsmodels==0.15.0
 jupyter==1.1.1
