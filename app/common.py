@@ -1,7 +1,10 @@
-"""Shared app helpers: load outputs, number formats, page layout, chart style and the sidebar."""
+"""Shared app helpers: load outputs, number formats, cards, page layout, charts and the sidebar."""
 import math
+import re
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
+from typing import NamedTuple
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -12,7 +15,7 @@ OUT = ROOT / "outputs"
 DOCS = ROOT / "docs"
 XLSX = OUT / "FruitBlend24_PnL.xlsx"
 
-APP_NAME = "FruitBlend24 case study"
+APP_NAME = "FruitBlend24 Analysis"
 AUTHOR = "Ratthapak Sinsiri"
 GITHUB_URL = "https://github.com/belseris/fruitblend24-case-study"
 LIVE_APP_URL = ""  # TODO: paste the Streamlit Cloud link after the first deploy.
@@ -21,22 +24,55 @@ ITEMS = ["Watermelon", "Pineapple", "Guava", "PassionFruit", "MixedBerryPremium"
 KITCHENS = ["Pattaya_Central", "Pattaya_Beach", "BKK_Sukhumvit", "BKK_Ladprao"]
 BERRY = "MixedBerryPremium"
 
-# One highlight color per chart, the rest grey. Same blue and red as the notebooks.
-KEY, LOSS, GREY, DARK, INK, MID = "#2a78d6", "#e34948", "#bdbcb6", "#52514e", "#0b0b0b", "#f0efec"
+# One accent for the point of a chart, grey for context, red for losses, green only for profit above 0.
+KEY, LOSS, GAIN, GREY, DARK, INK, MID = "#2a78d6", "#e34948", "#2f9e66", "#bdbcb6", "#52514e", "#0b0b0b", "#e6e5e1"
 HILITE = "#e3eefb"  # table row highlight
-SEQUENTIAL = [[0, "#cde2fb"], [0.5, "#5598e7"], [1, "#0d366b"]]
+SEQUENTIAL = [[0, "#eef4fc"], [0.5, "#5598e7"], [1, "#0d366b"]]
 
-# Page file -> (menu title, the question the page answers). Home and navigation both read this.
-HOME = ("Executive Summary", "What should we do, and what is it worth?")
+
+class PageInfo(NamedTuple):
+    menu: str  # name in the sidebar menu
+    question: str  # page title = the question the page answers
+    step: str | None  # short name in the story bar (None = not a story step)
+
+
+# Page file -> menu name, question, story step. Navigation, story bar, links and tests all read this.
+HOME = PageInfo("Summary", "FruitBlend24: where profit is lost and what to do next", None)
 PAGES = {
-    "pages/1_Data_Quality.py": ("Data Quality", "Can we trust the data?"),
-    "pages/2_Demand_and_Pricing.py": ("Demand and Pricing", "When and what do people buy, and is our price right?"),
-    "pages/3_Promotions.py": ("Promotions", "Which promotions make money?"),
-    "pages/4_PnL_and_Budget.py": ("P&L and Budget", "Where did profit go vs budget?"),
-    "pages/5_Forecast_and_Inventory.py": ("Forecast and Inventory", "What will we sell Sep-Nov and how much to prep?"),
-    "pages/6_Assumptions_and_Method.py": ("Assumptions and Method", "What did we assume, and how are the numbers built?"),
+    "pages/1_Data_Quality.py": PageInfo("Data quality", "Can we trust the data?", "Trust the data"),
+    "pages/2_Demand_and_Pricing.py": PageInfo("Demand and pricing", "When do people buy, and is our price right?",
+                                              "Demand and price"),
+    "pages/3_Promotions.py": PageInfo("Promotions", "Which promotions make money?", "Promotions"),
+    "pages/4_PnL_and_Budget.py": PageInfo("Profit vs budget", "Where did profit go vs budget?", "Profit vs budget"),
+    "pages/5_Forecast_and_Inventory.py": PageInfo("Forecast and prep", "What will we sell Sep-Nov and how much to prep?",
+                                                  "Forecast and prep"),
+    "pages/6_Assumptions_and_Method.py": PageInfo("Assumptions and method",
+                                                  "What did we assume, and how are the numbers built?", None),
 }
-METHOD_PAGE = "pages/6_Assumptions_and_Method.py"
+DQ, DEMAND, PROMO_PAGE, PNL, FORECAST, METHOD = PAGES
+STORY = [p for p, info in PAGES.items() if info.step]
+
+PROMO = {"RC101": "Bundle (RC101)", "RC102": "Double day (RC102)", "RC103": "Rainy season (RC103)"}
+
+# Column name on screen for every table. Columns not listed lose their "_" (see label()).
+NAMES = {
+    "gross_revenue": "Revenue", "gross_profit": "Gross profit", "operating_profit": "Operating profit",
+    "overhead": "Overhead", "waste_cost": "Waste cost", "waste_rate_pct": "Waste rate", "gp_pct": "GP %",
+    "thb_month_low": "฿ a month (low)", "thb_month_high": "฿ a month (high)", "thb_per_month": "฿ a month",
+    "in_plan": "In plan", "in_model": "In model", "kind": "Type", "level": "Level", "rows": "Rows", "cups": "Cups",
+    "sku": "Item", "kitchen": "Kitchen", "month": "Month", "table": "Table", "category": "Category",
+    "issue": "Issue", "effect": "Effect", "action": "Action", "confidence": "Confidence", "revenue_thb": "Revenue",
+    "cost_thb": "Cost filled", "pct_rows": "% of rows", "item_name_raw": "Raw name", "step": "Step",
+    "owner": "Owner", "start_date": "Start", "kpi": "KPI to watch", "stop_rule": "Stop rule", "name": "Name",
+    "problem": "Problem", "cause": "Cause", "note": "Note", "source": "Source", "sold": "Sold", "wasted": "Wasted",
+    "budget_revenue": "Budget revenue", "budget_gp": "Budget GP", "gp_var": "GP vs budget",
+    "revenue_effect": "Revenue effect", "margin_effect": "Margin effect", "line": "Step", "code": "Promo",
+    "platform": "Platform", "decision": "Decision", "change": "Change", "promo_days": "Promo days",
+    "main_risk": "Main risk", "rule": "Rule", "demand": "Demand", "prep_cups": "Prep (cups)",
+    "waste_cups": "Wasted (cups)", "short_cups": "Short (cups)", "fruit_budget_thb": "Fruit budget",
+    "thb_per_month_waste": "Waste a month", "elasticity_-1.5": "฿ a month (elasticity -1.5)",
+    "elasticity_-0.5": "฿ a month (elasticity -0.5)",
+}
 
 
 # ---- data ----
@@ -70,16 +106,16 @@ def decisions() -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["Date", "Lesson", "Decision", "Reason", "Impact"])
 
 
-def approach_note() -> tuple[Path, str]:
+def approach_note() -> tuple[Path, str] | None:
     """The note to download: the approach note once it exists, else the executive summary."""
     for name, label in [("approach_note.pdf", "Approach note (PDF)"), ("approach_note.md", "Approach note"),
                         ("executive_summary.md", "Executive summary")]:
         if (DOCS / name).exists():
             return DOCS / name, label
-    raise FileNotFoundError("no note in docs/")
+    return None
 
 
-# ---- number format ----
+# ---- number and text format ----
 
 def thb(x: float) -> str:
     """Money in short form: ฿31.15M, -฿404k, ฿7.6k, ฿457."""
@@ -126,13 +162,26 @@ def spct(x: float, digits: int = 1) -> str:
     return f"{x:+,.{digits}f}%"
 
 
+def pts(x: float) -> str:
+    """A change in percentage points: +1.2 pts."""
+    return f"{x:+.1f} pts"
+
+
 def month_name(m: str) -> str:
     """'2026-09' -> 'Sep 2026'."""
-    return pd.Timestamp(f"{m}-01").strftime("%b %Y")
+    return pd.Timestamp(f"{str(m)[:7]}-01").strftime("%b %Y")
+
+
+def month_short(m: str) -> str:
+    """'2026-09' -> 'Sep 26' (for axes and table columns)."""
+    return pd.Timestamp(f"{str(m)[:7]}-01").strftime("%b %y")
 
 
 def span(months) -> str:
     """Month range in words: 'Sep-Nov 2026' or 'Sep 2025 to Aug 2026'."""
+    months = [str(m)[:7] for m in months]
+    if not months:
+        return ""
     first, last = pd.Timestamp(f"{min(months)}-01"), pd.Timestamp(f"{max(months)}-01")
     if first.year == last.year:
         return f"{first:%b}-{last:%b %Y}"
@@ -150,35 +199,115 @@ def last_updated() -> str:
     return datetime.fromtimestamp(newest).strftime("%d %b %Y")
 
 
+def promo(text: str) -> str:
+    """Write promo codes with their names: RC101 -> Bundle (RC101). Safe to call twice."""
+    return re.sub(r"(?<!\()\bRC10[123]\b", lambda m: PROMO[m.group()], str(text))
+
+
+def short_item(s: str) -> str:
+    """MixedBerryPremium -> berry, for running text."""
+    return str(s).replace(BERRY, "berry")
+
+
+def title_case(s: str) -> str:
+    """Decision values on screen: 'keep + test' -> 'Keep + test'."""
+    s = str(s)
+    return s[:1].upper() + s[1:]
+
+
+def join(words, empty: str = "none") -> str:
+    """['a', 'b', 'c'] -> 'a, b and c'. Safe for an empty list."""
+    words = [str(w) for w in words]
+    if not words:
+        return empty
+    return words[0] if len(words) == 1 else f"{', '.join(words[:-1])} and {words[-1]}"
+
+
+def label(col: str) -> str:
+    """Column name on screen: no snake_case."""
+    if col in NAMES:
+        return NAMES[col]
+    return title_case(col.replace("_", " ")) if "_" in col else col
+
+
 # ---- page layout ----
 
-def page_header(question: str, answer: str) -> None:
-    """Page title = the question; under it the short answer, number first."""
-    st.title(question)
+def config() -> None:
+    """Same page setup on every page."""
+    st.set_page_config(page_title=APP_NAME, layout="wide")
+
+
+def story_bar(current: str | None = None) -> None:
+    """The 6 steps of the story in one row; the current step is highlighted, the others are links."""
+    with st.container(horizontal=True, gap="small", vertical_alignment="center"):
+        for i, page in enumerate(STORY, 1):
+            text = f"{i} {PAGES[page].step}"
+            if page == current:
+                st.badge(text, color="primary")
+            else:
+                st.page_link(page, label=text)
+
+
+def page_header(page: str, answer: str) -> None:
+    """Story bar, then title = the question, then the answer (max 2 sentences, number first)."""
+    config()
+    page = next((p for p, i in PAGES.items() if page in (p, i.question)), page)
+    story_bar(page)
+    st.title(PAGES[page].question if page in PAGES else page)
     st.markdown(answer)
+    st.session_state["page_answer"] = answer  # the tests check its length and words
 
 
-def chart_note(so_what: str) -> None:
-    """One line under a chart: what it means for the business."""
-    st.caption(f"So what: {so_what}")
-
-
-def how_to_read(text: str) -> None:
-    """Help for charts that need it (waterfall, matrix, newsvendor)."""
-    with st.expander("How to read this"):
-        st.markdown(text)
-
-
-def method_box(text: str) -> None:
-    """Method and assumptions at the bottom of a page, with a link to the decision log."""
+def next_page(page: str, label: str | None = None) -> None:
+    """Link to the next step at the bottom of a page."""
     st.divider()
-    with st.expander("Method and assumptions"):
-        st.markdown(text)
-        st.page_link(METHOD_PAGE, label="All decisions, glossary and data limits")
+    st.page_link(page, label=label or f"Next: {PAGES[page].question}")
+
+
+@contextmanager
+def card(title: str, so_what: str | None = None, how_to_read: str | None = None, method: str | None = None):
+    """A bordered card: finding as the title, help in popovers, 'So what' at the bottom."""
+    with st.container(border=True):
+        with st.container(horizontal=True, vertical_alignment="center", gap="small"):
+            st.markdown(f"**{title}**", width="stretch")
+            if how_to_read:
+                with st.popover("How to read"):
+                    st.markdown(how_to_read)
+            if method:
+                with st.popover("Method"):
+                    st.markdown(method)
+        yield
+        if so_what:
+            st.caption(f"So what: {so_what}")
+
+
+def kpi(label: str, value: str, delta: str | None = None, series=None, help: str | None = None, **kw) -> None:
+    """A KPI tile with an optional area sparkline (series = values over time, oldest first)."""
+    chart = None if series is None else [float(x) for x in series]
+    st.metric(label, value, delta, border=True, help=help, chart_data=chart, chart_type="area", height="stretch",
+              **kw)
+
+
+def kpi_row(tiles: list[dict]) -> None:
+    """KPI tiles side by side; each dict holds kpi() arguments."""
+    for col, tile in zip(st.columns(len(tiles)), tiles):
+        with col:
+            kpi(**tile)
+
+
+def best_worst(what: str, best_label: str, best: str, worst_label: str, worst: str) -> None:
+    """Best and worst of one kind (kitchen, item) on two short lines."""
+    st.markdown(f"Best {what}: **{best_label}** :green[{best}]  \nWorst {what}: **{worst_label}** :red[{worst}]")
+
+
+def choose(label: str, options: list[str], key: str, all_label: str | None = "All") -> str:
+    """A pill control for one chart or table; 'All' first and selected by default."""
+    opts = ([all_label] if all_label else []) + list(options)
+    return st.pills(label, opts, default=opts[0], required=True, key=key)
 
 
 def download(df: pd.DataFrame, name: str, label: str = "Download this table (CSV)") -> None:
-    """CSV download of the table on the page."""
+    """CSV download of a table."""
     st.download_button(label, df.to_csv(index=False).encode("utf-8"), file_name=f"{name}.csv", mime="text/csv",
                        key=f"dl_{name}", on_click="ignore")
 
@@ -188,35 +317,57 @@ def fit_height(n_rows: int, max_rows: int = 20) -> int | str:
     return 35 * (n_rows + 1) + 3 if n_rows <= max_rows else "auto"
 
 
-def table(df: pd.DataFrame, money=(), pcts=(), count=(), per_cup=(), dec=(), highlight=None, **kw) -> None:
-    """Show a table with ฿ and % formats. Values stay numbers, so sorting still works."""
+def _draw(df: pd.DataFrame, money, pcts, count, per_cup, dec, highlight, **kw) -> None:
+    """Draw one formatted table with screen names."""
     df = df.reset_index(drop=True)
+    for col in df.columns[df.dtypes == bool]:
+        df[col] = df[col].map({True: "Yes", False: "No"})
     text = df.select_dtypes(exclude="number").columns
     df[text] = df[text].fillna("")
     fmt = {**{col: thb for col in money}, **{col: pct for col in pcts}, **{col: "{:,.0f}".format for col in count},
            **{col: baht for col in per_cup}, **{col: "{:,.2f}".format for col in dec}}
+    fmt = {label(col): f for col, f in fmt.items() if col in df.columns}
+    df = df.rename(columns=label)
     sty = df.style.format(fmt, na_rep="-")
     if highlight is not None:
         mark = pd.Series(highlight).reset_index(drop=True)
         sty = sty.apply(lambda r: [f"background-color: {HILITE}" if mark[r.name] else "" for _ in r], axis=1)
+    if "column_config" in kw:
+        kw["column_config"] = {label(k): v for k, v in kw["column_config"].items()}
     st.dataframe(sty, hide_index=True, **({"height": fit_height(len(df))} | kw))
 
 
-def pick(label: str, options: list[str], key: str, all_label: str = "All") -> str:
-    """Sidebar filter with 'All' first (the default)."""
-    return st.sidebar.selectbox(label, [all_label] + list(options), key=key)
+def table(df: pd.DataFrame, money=(), pcts=(), count=(), per_cup=(), dec=(), highlight=None, cols=None,
+          name: str | None = None, raw: pd.DataFrame | None = None, **kw) -> None:
+    """Show a table with screen names and ฿/% formats (values stay numbers, so sorting works).
+
+    cols = the few columns that make the point; then the full table goes in a 'Full table' expander.
+    name = file name of the CSV download; raw = the frame to download if not df.
+    """
+    fmt = dict(money=money, pcts=pcts, count=count, per_cup=per_cup, dec=dec, highlight=highlight)
+    wide = cols is not None and len(cols) < len(df.columns)
+    _draw(df[list(cols)] if wide else df, **fmt, **kw)
+    if wide:
+        with st.expander("Full table"):
+            _draw(df, **fmt, **{k: v for k, v in kw.items() if k != "column_config"})
+            if name:
+                download(df if raw is None else raw, name)
+    elif name:
+        download(df if raw is None else raw, name)
 
 
 # ---- charts ----
 
 def colors(index, keys, color: str = KEY) -> list[str]:
-    """Highlight color for the key bars, grey for the rest."""
+    """Accent color for the key bars, grey for the rest."""
     return [color if i in keys else GREY for i in index]
 
 
 def money_ticks(lo: float, hi: float, n: int = 5) -> dict:
     """Axis ticks written as ฿ (-฿400k, ฿1.20M), about n steps from lo to hi."""
     raw = (hi - lo) / n
+    if raw <= 0:
+        return {}
     mag = 10 ** math.floor(math.log10(raw))
     step = next(m * mag for m in (1, 2, 2.5, 5, 10) if m * mag >= raw)
     vals = [math.floor(lo / step) * step + i * step for i in range(n + 2)]
@@ -224,33 +375,85 @@ def money_ticks(lo: float, hi: float, n: int = 5) -> dict:
     return dict(tickvals=vals, ticktext=[thb(v) for v in vals])
 
 
-def show(fig: go.Figure, title: str, sub: str, height: int = 420, legend: bool = False) -> None:
-    """Draw a Plotly chart. Title = the finding ('; ' starts a new line), sub = what is plotted, with units."""
-    text = title.replace("; ", ";<br>") + f"<br><span style='font-size:12px;color:{DARK}'>{sub}</span>"
+def show(fig: go.Figure, *old, height: int = 360, legend: bool = False, key: str | None = None) -> None:
+    """Draw a Plotly chart in the app style: no title (the card has it), transparent, small margins."""
+    if old:
+        st.markdown(f"**{old[0]}**")
     fig.update_layout(
-        template="plotly_white", height=height, showlegend=legend, hoverlabel=dict(font_size=13),
-        paper_bgcolor="white", plot_bgcolor="white",
-        title=dict(text=text, x=0, xanchor="left", font=dict(size=16, color=INK)),
-        margin=dict(t=100, l=10, r=10, b=90 if legend else 40), font=dict(size=13),
-        # The legend sits at the bottom edge of the figure, below the x-axis title.
-        legend=dict(orientation="h", yref="container", y=0.01, yanchor="bottom", x=0, xanchor="left"))
-    fig.update_xaxes(gridcolor=MID, zerolinecolor=MID)
-    fig.update_yaxes(gridcolor=MID, zerolinecolor=MID)
-    st.plotly_chart(fig, theme=None, config={"displaylogo": False})
+        height=height, showlegend=legend, title=None, hoverlabel=dict(font_size=13),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=36 if legend else 8, l=4, r=8, b=4),
+        legend=dict(orientation="h", yanchor="bottom", y=1.0, x=0, xanchor="left", title=None))
+    fig.update_xaxes(gridcolor=MID, zerolinecolor=MID, automargin=True)
+    fig.update_yaxes(gridcolor=MID, zerolinecolor=MID, automargin=True)
+    st.plotly_chart(fig, theme="streamlit", key=key, config={"displaylogo": False, "displayModeBar": False})
+
+
+def area_around_zero(x: list[str], y: list[float]) -> go.Figure:
+    """Profit over time as an area: green above 0, red below 0 (the line crosses 0 between points)."""
+    xs, ys = list(range(len(y))), list(y)
+    px, py = [], []  # points with the 0 crossings added, so each color stops exactly at 0
+    for i in range(len(ys)):
+        if i and (ys[i - 1] < 0) != (ys[i] < 0):
+            t = ys[i - 1] / (ys[i - 1] - ys[i])
+            px.append(xs[i - 1] + t)
+            py.append(0.0)
+        px.append(xs[i])
+        py.append(ys[i])
+    fig = go.Figure()
+    fig.add_scatter(x=px, y=[max(v, 0) for v in py], fill="tozeroy", mode="none", fillcolor="rgba(47,158,102,0.35)",
+                    hoverinfo="skip")
+    fig.add_scatter(x=px, y=[min(v, 0) for v in py], fill="tozeroy", mode="none", fillcolor="rgba(227,73,72,0.35)",
+                    hoverinfo="skip")
+    fig.add_scatter(x=xs, y=ys, mode="lines+markers", line=dict(color=DARK, width=1.5), marker=dict(size=4),
+                    customdata=[[m, thb(v)] for m, v in zip(x, ys)],
+                    hovertemplate="%{customdata[0]}<br>%{customdata[1]}<extra></extra>")
+    fig.add_hline(y=0, line=dict(color=DARK, width=1))
+    step = max(1, len(x) // 4)
+    fig.update_xaxes(tickvals=xs[::step], ticktext=x[::step], showgrid=False)
+    return fig
 
 
 # ---- sidebar ----
 
 def sidebar() -> None:
-    """App info, links and downloads; shown under the page filters on every page."""
+    """App info, links and downloads; the same on every page."""
     sb = st.sidebar
     sb.divider()
     sb.markdown(f"**{APP_NAME}**  \nAnalyst case study for Atmind Group  \nby {AUTHOR}")
     links = [f"[GitHub repo]({GITHUB_URL})"] + ([f"[Live app]({LIVE_APP_URL})"] if LIVE_APP_URL else [])
     sb.markdown(" · ".join(links))
-    sb.download_button("P&L workbook (xlsx)", read_bytes(XLSX), file_name=XLSX.name, key="dl_xlsx",
-                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", on_click="ignore")
-    note, label = approach_note()
-    sb.download_button(label, read_bytes(note), file_name=note.name, key="dl_note",
-                       mime="application/pdf" if note.suffix == ".pdf" else "text/markdown", on_click="ignore")
-    sb.caption(f"Data: {data_period()}  \nLast updated: {last_updated()}")
+    if XLSX.exists():
+        sb.download_button("Download FruitBlend24_PnL.xlsx", read_bytes(XLSX), file_name=XLSX.name, key="dl_xlsx",
+                           mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                           on_click="ignore")
+    note = approach_note()
+    if note:
+        path, text = note
+        sb.download_button(f"Download {text.lower()}", read_bytes(path), file_name=path.name, key="dl_note",
+                           mime="application/pdf" if path.suffix == ".pdf" else "text/markdown", on_click="ignore")
+    sb.caption(f"Data period: {data_period()}  \nLast updated: {last_updated()}")
+
+
+# ---- old helpers, kept until every page uses cards (phase C) ----
+
+def pick(label: str, options: list[str], key: str, all_label: str = "All") -> str:
+    """Old sidebar filter."""
+    return st.sidebar.selectbox(label, [all_label] + list(options), key=key)
+
+
+def chart_note(so_what: str) -> None:
+    """Old 'So what' line."""
+    st.caption(f"So what: {so_what}")
+
+
+def how_to_read(text: str) -> None:
+    """Old help box."""
+    with st.expander("How to read this"):
+        st.markdown(text)
+
+
+def method_box(text: str) -> None:
+    """Old method box."""
+    with st.expander("Method and assumptions"):
+        st.markdown(text)

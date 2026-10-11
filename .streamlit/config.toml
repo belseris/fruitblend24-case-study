@@ -4,7 +4,8 @@ primaryColor = "#2a78d6"
 backgroundColor = "#ffffff"
 secondaryBackgroundColor = "#f4f5f7"
 textColor = "#0b0b0b"
-font = "sans serif"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+baseRadius = "medium"
 
 [client]
 toolbarMode = "viewer"

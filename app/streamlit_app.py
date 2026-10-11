@@ -5,7 +5,7 @@ import streamlit as st
 
 import common as c
 
-st.set_page_config(page_title=c.APP_NAME, layout="wide")
+c.config()
 
 # Page with the evidence for each recommendation area.
 AREA_PAGE = {"Waste": "pages/5_Forecast_and_Inventory.py", "Pricing": "pages/2_Demand_and_Pricing.py",
@@ -179,7 +179,7 @@ def home() -> None:
     scenario_chart()
 
     st.subheader("How to use this app")
-    guide = pd.DataFrame([c.HOME] + list(c.PAGES.values()), columns=["Page", "Question it answers"])
+    guide = pd.DataFrame([(i.menu, i.question) for i in c.PAGES.values()], columns=["Page", "Question it answers"])
     st.dataframe(guide, hide_index=True)
     st.caption("Use the menu on the left. Pages with data by kitchen or item have filters in the sidebar; "
                "every table has a CSV download.")
@@ -194,6 +194,6 @@ def home() -> None:
             "items and kitchens to company), so the app, the notebooks and the Excel P&L show the same numbers.")
 
 
-pages = [st.Page(home, title=c.HOME[0], default=True)] + [st.Page(p, title=t) for p, (t, _) in c.PAGES.items()]
+pages = [st.Page(home, title=c.HOME.menu, default=True)] + [st.Page(p, title=i.menu) for p, i in c.PAGES.items()]
 st.navigation(pages).run()
 c.sidebar()
