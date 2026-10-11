@@ -19,6 +19,7 @@ APP_NAME = "FruitBlend24 Analysis"
 AUTHOR = "Ratthapak Sinsiri"
 GITHUB_URL = "https://github.com/belseris/fruitblend24-case-study"
 LIVE_APP_URL = "https://fruitblend24.streamlit.app"
+NOTEBOOKS_URL = "https://belseris.github.io/fruitblend24-case-study/"  # executed notebooks as HTML (GitHub Pages)
 
 ITEMS = ["Watermelon", "Pineapple", "Guava", "PassionFruit", "MixedBerryPremium"]
 KITCHENS = ["Pattaya_Central", "Pattaya_Beach", "BKK_Sukhumvit", "BKK_Ladprao"]
@@ -466,7 +467,8 @@ def sidebar() -> None:
     sb = st.sidebar
     sb.divider()
     sb.markdown(f"**{APP_NAME}**  \nAnalyst case study for Atmind Group  \nby {AUTHOR}")
-    links = [f"[GitHub repo]({GITHUB_URL})"] + ([f"[Live app]({LIVE_APP_URL})"] if LIVE_APP_URL else [])
+    links = [f"[GitHub repo]({GITHUB_URL})", f"[Notebooks]({NOTEBOOKS_URL})"]
+    links += [f"[Live app]({LIVE_APP_URL})"] if LIVE_APP_URL else []
     sb.markdown(" · ".join(links))
     if XLSX.exists():
         sb.download_button("Download FruitBlend24_PnL.xlsx", read_bytes(XLSX), file_name=XLSX.name, key="dl_xlsx",

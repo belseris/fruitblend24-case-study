@@ -17,6 +17,23 @@ a budget gap analysis, price and promo decisions, a Sep-Nov forecast and a coste
 - **Four actions add ฿92k to ฿118k a month** and cut the Sep-Nov 2026 loss from ฿685k to ฿408k (cautious case).
   Breaking even needs about ฿136k a month more in cost cuts, 40% of the Bangkok overhead.
 
+## View the notebooks
+
+The notebooks are saved with their outputs, so you can read them without running anything.
+
+- **All notebooks (GitHub Pages):** [belseris.github.io/fruitblend24-case-study](https://belseris.github.io/fruitblend24-case-study/)
+
+| Notebook | GitHub Pages (HTML, interactive charts) | nbviewer (backup) |
+| --- | --- | --- |
+| 01 Data quality | [HTML](https://belseris.github.io/fruitblend24-case-study/notebooks/01_data_quality.html) | [nbviewer](https://nbviewer.org/github/belseris/fruitblend24-case-study/blob/main/notebooks/01_data_quality.ipynb) |
+| 02 Demand and pricing | [HTML](https://belseris.github.io/fruitblend24-case-study/notebooks/02_demand_pricing.html) | [nbviewer](https://nbviewer.org/github/belseris/fruitblend24-case-study/blob/main/notebooks/02_demand_pricing.ipynb) |
+| 03 Promotions | [HTML](https://belseris.github.io/fruitblend24-case-study/notebooks/03_promotions.html) | [nbviewer](https://nbviewer.org/github/belseris/fruitblend24-case-study/blob/main/notebooks/03_promotions.ipynb) |
+| 04 P&L and budget | [HTML](https://belseris.github.io/fruitblend24-case-study/notebooks/04_pnl_budget.html) | [nbviewer](https://nbviewer.org/github/belseris/fruitblend24-case-study/blob/main/notebooks/04_pnl_budget.ipynb) |
+| 05 Forecast and inventory | [HTML](https://belseris.github.io/fruitblend24-case-study/notebooks/05_forecast_inventory.html) | [nbviewer](https://nbviewer.org/github/belseris/fruitblend24-case-study/blob/main/notebooks/05_forecast_inventory.ipynb) |
+| 06 Summary numbers | [HTML](https://belseris.github.io/fruitblend24-case-study/notebooks/06_summary.html) | [nbviewer](https://nbviewer.org/github/belseris/fruitblend24-case-study/blob/main/notebooks/06_summary.ipynb) |
+
+On GitHub itself the charts show as static PNG images.
+
 ## What is in the repo
 
 ```
@@ -25,7 +42,8 @@ notebooks/      01 data quality, 02 demand and pricing, 03 promotions, 04 P&L an
                 05 forecast and prep, 06 summary (checks the numbers in the docs)
 src/            cleaning, unit economics, P&L, forecast and scenario code the notebooks call
 outputs/        tables the notebooks write and the app reads, plus FruitBlend24_PnL.xlsx (live formulas)
-docs/           approach_note.md, executive_summary.md, decisions.md (every judgment call)
+docs/           approach_note.md, executive_summary.md, decisions.md (every judgment call),
+                index.html + notebooks/*.html (the GitHub Pages site)
 data/raw/       the case workbook (never changed); data/processed/ the name mapping and clean log
 tests/          app tests: every page and control runs, KPIs equal the P&L, screen text rules
 ```
@@ -51,6 +69,11 @@ pip install -r requirements-dev.txt
 Get-ChildItem notebooks/0*.ipynb | Sort-Object Name | ForEach-Object { jupyter nbconvert --to notebook --execute --inplace $_.FullName }
 pytest -q
 ```
+
+Dev note: the notebooks save a PNG copy of each plotly chart so GitHub can show it. That needs `kaleido`
+(`pip install kaleido`, it uses your installed Chrome). It is not in the requirements files because the app does not
+use it. To rebuild the HTML pages after a run:
+`jupyter nbconvert --to html notebooks/0*.ipynb --output-dir docs/notebooks`.
 
 Run the notebooks in order (01 to 06). Each one asserts its key totals, so a run that ends without an error means:
 
