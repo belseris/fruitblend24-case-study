@@ -44,12 +44,15 @@ PAGES = {
                                               "Demand and price"),
     "pages/3_Promotions.py": PageInfo("Promotions", "Which promotions make money?", "Promotions"),
     "pages/4_PnL_and_Budget.py": PageInfo("Profit vs budget", "Where did profit go vs budget?", "Profit vs budget"),
-    "pages/5_Forecast_and_Inventory.py": PageInfo("Forecast and prep", "What will we sell Sep-Nov and how much to prep?",
-                                                  "Forecast and prep"),
-    "pages/6_Assumptions_and_Method.py": PageInfo("Assumptions and method",
+    "pages/5_Forecast_and_Prep.py": PageInfo("Forecast and prep",
+                                             "What will we sell in Sep-Nov, and how much should we prep?",
+                                             "Forecast and prep"),
+    "pages/6_Action_Plan.py": PageInfo("Action plan", "What is Sep-Nov profit with and without the plan?",
+                                       "Action plan"),
+    "pages/7_Assumptions_and_Method.py": PageInfo("Assumptions and method",
                                                   "What did we assume, and how are the numbers built?", None),
 }
-DQ, DEMAND, PROMO_PAGE, PNL, FORECAST, METHOD = PAGES
+DQ, DEMAND, PROMO_PAGE, PNL, FORECAST, ACTION, METHOD = PAGES
 STORY = [p for p, info in PAGES.items() if info.step]
 
 PROMO = {"RC101": "Bundle (RC101)", "RC102": "Double day (RC102)", "RC103": "Rainy season (RC103)"}
@@ -65,13 +68,13 @@ NAMES = {
     "cost_thb": "Cost filled", "pct_rows": "% of rows", "item_name_raw": "Raw name", "step": "Step",
     "owner": "Owner", "start_date": "Start", "kpi": "KPI to watch", "stop_rule": "Stop rule", "name": "Name",
     "problem": "Problem", "cause": "Cause", "note": "Note", "source": "Source", "sold": "Sold", "wasted": "Wasted",
-    "budget_revenue": "Budget revenue", "budget_gp": "Budget GP", "gp_var": "GP vs budget",
+    "revenue_change_thb": "Revenue changed", "budget_revenue": "Budget revenue", "budget_gp": "Budget GP", "gp_var": "GP vs budget",
     "revenue_effect": "Revenue effect", "margin_effect": "Margin effect", "line": "Step", "code": "Promo",
     "platform": "Platform", "decision": "Decision", "change": "Change", "promo_days": "Promo days",
     "main_risk": "Main risk", "rule": "Rule", "demand": "Demand", "prep_cups": "Prep (cups)",
     "waste_cups": "Wasted (cups)", "short_cups": "Short (cups)", "fruit_budget_thb": "Fruit budget",
     "thb_per_month_waste": "Waste a month", "elasticity_-1.5": "฿ a month (elasticity -1.5)",
-    "elasticity_-0.5": "฿ a month (elasticity -0.5)",
+    "elasticity_-0.5": "฿ a month (elasticity -0.5)", "examples": "Examples", "revenue": "Revenue",
 }
 
 
@@ -251,9 +254,8 @@ def story_bar(current: str | None = None) -> None:
 def page_header(page: str, answer: str) -> None:
     """Story bar, then title = the question, then the answer (max 2 sentences, number first)."""
     config()
-    page = next((p for p, i in PAGES.items() if page in (p, i.question)), page)
     story_bar(page)
-    st.title(PAGES[page].question if page in PAGES else page)
+    st.title(PAGES[page].question)
     st.markdown(answer)
     st.session_state["page_answer"] = answer  # the tests check its length and words
 
@@ -268,7 +270,7 @@ def next_page(page: str, label: str | None = None) -> None:
 def card(title: str, so_what: str | None = None, how_to_read: str | None = None, method: str | None = None):
     """A bordered card: finding as the title, help in popovers, 'So what' at the bottom."""
     with st.container(border=True):
-        with st.container(horizontal=True, vertical_alignment="center", gap="small"):
+        with st.container(horizontal=True, vertical_alignment="top", gap="small", wrap=False):
             st.markdown(f"**{title}**", width="stretch")
             if how_to_read:
                 with st.popover("How to read"):
@@ -303,7 +305,7 @@ def best_worst(what: str, best_label: str, best: str, worst_label: str, worst: s
 def choose(label: str, options: list[str], key: str, all_label: str | None = "All") -> str:
     """A pill control for one chart or table; 'All' first and selected by default."""
     opts = ([all_label] if all_label else []) + list(options)
-    return st.pills(label, opts, default=opts[0], required=True, key=key)
+    return st.pills(label, opts, default=opts[0], required=True, key=key, width="stretch")
 
 
 def download(df: pd.DataFrame, name: str, label: str = "Download this table (CSV)") -> None:
@@ -317,34 +319,39 @@ def fit_height(n_rows: int, max_rows: int = 20) -> int | str:
     return 35 * (n_rows + 1) + 3 if n_rows <= max_rows else "auto"
 
 
-def _draw(df: pd.DataFrame, money, pcts, count, per_cup, dec, highlight, **kw) -> None:
-    """Draw one formatted table with screen names."""
+def _draw(df: pd.DataFrame, money, pcts, count, per_cup, dec, exact, highlight, static=False, **kw) -> None:
+    """Draw one formatted table with screen names. static = a plain table that wraps long text."""
     df = df.reset_index(drop=True)
     for col in df.columns[df.dtypes == bool]:
         df[col] = df[col].map({True: "Yes", False: "No"})
     text = df.select_dtypes(exclude="number").columns
     df[text] = df[text].fillna("")
     fmt = {**{col: thb for col in money}, **{col: pct for col in pcts}, **{col: "{:,.0f}".format for col in count},
-           **{col: baht for col in per_cup}, **{col: "{:,.2f}".format for col in dec}}
+           **{col: baht for col in per_cup}, **{col: "{:,.2f}".format for col in dec},
+           **{col: thb_full for col in exact}}
     fmt = {label(col): f for col, f in fmt.items() if col in df.columns}
     df = df.rename(columns=label)
     sty = df.style.format(fmt, na_rep="-")
     if highlight is not None:
         mark = pd.Series(highlight).reset_index(drop=True)
         sty = sty.apply(lambda r: [f"background-color: {HILITE}" if mark[r.name] else "" for _ in r], axis=1)
+    if static:
+        st.table(sty.hide(axis="index"), border="horizontal")
+        return
     if "column_config" in kw:
         kw["column_config"] = {label(k): v for k, v in kw["column_config"].items()}
     st.dataframe(sty, hide_index=True, **({"height": fit_height(len(df))} | kw))
 
 
-def table(df: pd.DataFrame, money=(), pcts=(), count=(), per_cup=(), dec=(), highlight=None, cols=None,
+def table(df: pd.DataFrame, money=(), pcts=(), count=(), per_cup=(), dec=(), exact=(), highlight=None, cols=None,
           name: str | None = None, raw: pd.DataFrame | None = None, **kw) -> None:
     """Show a table with screen names and ฿/% formats (values stay numbers, so sorting works).
 
     cols = the few columns that make the point; then the full table goes in a 'Full table' expander.
+    static=True draws a plain table that wraps long text (for action and rule columns).
     name = file name of the CSV download; raw = the frame to download if not df.
     """
-    fmt = dict(money=money, pcts=pcts, count=count, per_cup=per_cup, dec=dec, highlight=highlight)
+    fmt = dict(money=money, pcts=pcts, count=count, per_cup=per_cup, dec=dec, exact=exact, highlight=highlight)
     wide = cols is not None and len(cols) < len(df.columns)
     _draw(df[list(cols)] if wide else df, **fmt, **kw)
     if wide:
@@ -375,10 +382,8 @@ def money_ticks(lo: float, hi: float, n: int = 5) -> dict:
     return dict(tickvals=vals, ticktext=[thb(v) for v in vals])
 
 
-def show(fig: go.Figure, *old, height: int = 360, legend: bool = False, key: str | None = None) -> None:
+def show(fig: go.Figure, height: int = 360, legend: bool = False, key: str | None = None) -> None:
     """Draw a Plotly chart in the app style: no title (the card has it), transparent, small margins."""
-    if old:
-        st.markdown(f"**{old[0]}**")
     fig.update_layout(
         height=height, showlegend=legend, title=None, hoverlabel=dict(font_size=13),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
@@ -409,8 +414,8 @@ def area_around_zero(x: list[str], y: list[float]) -> go.Figure:
                     customdata=[[m, thb(v)] for m, v in zip(x, ys)],
                     hovertemplate="%{customdata[0]}<br>%{customdata[1]}<extra></extra>")
     fig.add_hline(y=0, line=dict(color=DARK, width=1))
-    step = max(1, len(x) // 4)
-    fig.update_xaxes(tickvals=xs[::step], ticktext=x[::step], showgrid=False)
+    ends = [0, len(x) - 1] if x else []
+    fig.update_xaxes(tickvals=ends, ticktext=[x[i] for i in ends], tickangle=0, showgrid=False)
     return fig
 
 
@@ -434,26 +439,3 @@ def sidebar() -> None:
                            mime="application/pdf" if path.suffix == ".pdf" else "text/markdown", on_click="ignore")
     sb.caption(f"Data period: {data_period()}  \nLast updated: {last_updated()}")
 
-
-# ---- old helpers, kept until every page uses cards (phase C) ----
-
-def pick(label: str, options: list[str], key: str, all_label: str = "All") -> str:
-    """Old sidebar filter."""
-    return st.sidebar.selectbox(label, [all_label] + list(options), key=key)
-
-
-def chart_note(so_what: str) -> None:
-    """Old 'So what' line."""
-    st.caption(f"So what: {so_what}")
-
-
-def how_to_read(text: str) -> None:
-    """Old help box."""
-    with st.expander("How to read this"):
-        st.markdown(text)
-
-
-def method_box(text: str) -> None:
-    """Old method box."""
-    with st.expander("Method and assumptions"):
-        st.markdown(text)

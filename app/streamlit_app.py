@@ -22,7 +22,7 @@ LOOK_FIRST = {
     c.PROMO_PAGE: "The decision table: which codes to stop and which to test",
     c.PNL: "The budget-to-actual waterfall, then the four kitchen cards",
     c.FORECAST: "The three forecast tiles, then the prep rule backtest",
-    "pages/6_Action_Plan.py": "The four scenario tiles, then who does what, by when",
+    c.ACTION: "The four scenario tiles, then who does what, by when",
     c.METHOD: "The glossary, then search the decision log",
 }
 
@@ -124,6 +124,7 @@ def actions() -> None:
             st.caption(f"All {len(costed)} costed actions together: "
                        f"{c.thb_range(total['thb_month_low'], total['thb_month_high'])} a month in one model "
                        "(not a sum of the rows, so nothing is counted twice).")
+            st.page_link(c.ACTION, label=f"Detail: {c.PAGES[c.ACTION].menu}")
 
 
 def kitchens() -> None:

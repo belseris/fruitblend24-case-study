@@ -1,4 +1,4 @@
-"""Promotions: lift needed vs lift measured, net CM per code, keep/modify/kill and waste on promo days."""
+"""Promotions: lift needed vs lift measured, net profit per code, keep/modify/kill and waste on promo days."""
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -15,123 +15,150 @@ codes = inc[inc["level"] == "code"].set_index("code")
 net_month = codes["net"] / months
 kill, modify = dec[dec["decision"] == "Kill"], dec[dec["decision"] == "Modify + test"]
 
-c.page_header(
-    c.PAGES["pages/3_Promotions.py"][1],
-    f"**None of them: all {len(codes)} codes lose money after waste and side effects, "
-    f"{c.thb(net_month.sum())} a month together.** Stop {len(kill)} of {len(dec)} promo rows "
-    f"(saves {c.thb(kill['kill_saving'].sum())} a month). Change and test the other {len(modify)} "
-    f"(up to {c.sthb(modify['modify_net'].sum())} a month if the tests pass). Keep: none.")
-
-# ---- lift ----
-st.subheader("Do promos sell enough extra cups?")
-cp = summ[summ["level"] == "code_platform"].groupby("base_code")[["cups", "cm_thb_if_full_price", "cm_thb_promo"]].sum()
-sk = (summ[summ["level"] == "code_platform_sku"].query("base_code == 'RC101'")
-      .groupby("sku")[["cm_thb_if_full_price", "cm_thb_promo"]].sum())
-need = {code: (r["cm_thb_if_full_price"] / r["cm_thb_promo"] - 1) * 100 for code, r in cp.iterrows()}
-need |= {f"RC101 {s}": (r["cm_thb_if_full_price"] / r["cm_thb_promo"] - 1) * 100 for s, r in sk.iterrows()}
-got = {code: r["actual_lift_pct"] for code, r in codes.iterrows()}
-got |= {f"RC101 {r['sku']}": r["actual_lift_pct"] for _, r in inc[inc["level"] == "rc101_sku"].iterrows()}
-labels = [k for k in ["RC102", "RC103", "RC101"] + [f"RC101 {s}" for s in c.ITEMS] if k in need and k in got]
-ex = cp.loc["RC102"]
-st.markdown(f"**Break-even lift** = how many more cups a promo must sell just to earn the same CM as at full price "
-            f"(CM per cup at full price / CM per cup at promo price - 1). Example: RC102 cuts CM from "
-            f"{c.baht(ex['cm_thb_if_full_price'] / ex['cups'])} to {c.baht(ex['cm_thb_promo'] / ex['cups'])} a cup, "
-            f"so it needs {c.spct(need['RC102'], 0)} more cups.")
-fig = go.Figure()
-fig.add_bar(x=labels, y=[need[k] for k in labels], name="Lift needed to break even", marker_color=c.GREY,
-            hovertemplate="%{x}<br>needs %{y:+.0f}% cups<extra></extra>")
-fig.add_bar(x=labels, y=[got[k] for k in labels], name="Lift measured vs normal days", marker_color=c.KEY,
-            hovertemplate="%{x}<br>sold %{y:+.0f}% cups<extra></extra>")
-fig.update_yaxes(title="% more cups than on normal days", ticksuffix="%")
-short = [k for k in labels if got[k] < need[k]]
-c.show(fig, f"{len(short)} of {len(labels)} promo groups sell fewer extra cups than they need, even before waste; "
-            f"RC102 sells {c.spct(got['RC102'], 0)} but needs {c.spct(need['RC102'], 0)}",
-       f"Break-even lift vs measured lift, {c.data_period()}. RC101 = bundle on one item, RC102 = double day, "
-       "RC103 = rainy season", height=420, legend=True)
-ok = [k for k in labels if k not in short]
-c.chart_note(("no promo group" if not ok else " and ".join(ok)) + " sells enough extra cups to pay for its "
-             "discount. A promo can still be worth it for new customers, but the data cannot measure that.")
-
-# ---- net ----
-st.subheader("What does each code earn after waste and side effects?")
-worst = net_month.idxmin()
-fig = go.Figure(go.Bar(x=net_month.index, y=net_month, marker_color=c.colors(net_month.index, [worst], c.LOSS),
-                       text=[c.thb(v) for v in net_month], textposition="outside",
-                       customdata=[c.thb(v) for v in net_month], hovertemplate="%{x}<br>%{customdata} a month<extra></extra>"))
-fig.add_hline(y=0, line=dict(color=c.DARK, width=1))
-lo = net_month.min() * 1.35
-fig.update_yaxes(title="Net CM a month (฿)", range=[lo, 0], **c.money_ticks(lo, 0, 4))
-c.show(fig, f"All {len(net_month)} codes lose CM: {c.thb(net_month.sum())} a month together; "
-            f"{worst} loses the most ({c.thb(net_month[worst])})",
-       "Net incremental CM a month = promo CM - normal-day cups x full-price CM + extra waste + side effects",
-       height=380)
-c.how_to_read("Start from the CM the promo days earned. Take away what the same hours would have earned on a normal "
-              "day at full price (the baseline cups). Add the extra waste on promo days and the side effects: other "
-              "items sold more or less, and sales pulled from the next days. Below 0 means we would have earned "
-              "more without the promo.")
-c.chart_note(f"stopping every code would add about {c.thb(-net_month.sum())} a month; the table below keeps the "
-             "versions that a small change could turn positive.")
-ntbl = codes.reset_index()[["code", "cups", "baseline_cups", "actual_lift_pct", "inc", "waste", "spill", "pull", "net"]]
-ntbl["net a month"] = ntbl["net"] / months
-ntbl = ntbl.rename(columns={"baseline_cups": "baseline cups", "actual_lift_pct": "lift", "inc": "CM vs baseline",
-                            "waste": "extra waste", "spill": "other items", "pull": "pull-forward", "net": "net (year)"})
-c.table(ntbl, count=["cups", "baseline cups"], pcts=["lift"],
-        money=["CM vs baseline", "extra waste", "other items", "pull-forward", "net (year)", "net a month"])
-c.download(ntbl, "promo_net_by_code")
-
-# ---- decisions ----
-st.subheader("Keep, modify or kill?")
-pick = st.selectbox("Decision", ["All"] + sorted(dec["decision"].unique()), key="pr_decision")
-d = dec if pick == "All" else dec[dec["decision"] == pick]
-dtbl = d[["code", "platform", "sku", "decision", "change", "promo_days", "net_per_month_new_prices", "kill_saving",
-          "modify_net", "confidence", "main_risk"]].rename(columns={
-    "sku": "item", "promo_days": "promo days", "net_per_month_new_prices": "today a month",
-    "kill_saving": "saving if killed", "modify_net": "if the test passes", "main_risk": "main risk"})
-c.table(dtbl, count=["promo days"], money=["today a month", "saving if killed", "if the test passes"],
-        highlight=d["decision"].eq("Kill"))
-st.caption(f"Kill rows save {c.thb(kill['kill_saving'].sum())} a month. Modify rows add "
-           f"{c.sthb(modify['modify_net'].sum())} a month only if their tests pass "
-           f"(range {c.thb(modify['modify_low'].sum())} to {c.thb(modify['modify_high'].sum())}). "
-           "Today = net CM a month at the new Watermelon and PassionFruit prices.")
-c.download(dec, "promo_decision")
-
-# ---- waste ----
-st.subheader("Do promo days waste more?")
+# Waste on days with and without a promo for that item.
 pw = ws[ws["level"] == "item x promo day"].copy()
 pw[["sku", "promo"]] = pw["group"].str.split(" | ", regex=False, expand=True)
 pw = pw.pivot(index="sku", columns="promo", values=["wasted_per_kitchen_day", "waste_rate_pct"]).reindex(c.ITEMS)
 more = (pw[("wasted_per_kitchen_day", "True")] / pw[("wasted_per_kitchen_day", "False")] - 1) * 100
+
+c.page_header(
+    c.PROMO_PAGE,
+    f"**{c.thb(net_month.sum())} a month: all {len(codes)} promo codes lose money after waste and side effects.** "
+    f"Stop {len(kill)} of {len(dec)} promo rows (saves {c.thb(kill['kill_saving'].sum())} a month) and test changes "
+    f"on the other {len(modify)} (up to {c.sthb(modify['modify_net'].sum())}).")
+
+c.kpi_row([
+    dict(label="Promo loss a month", value=c.thb(net_month.sum()),
+         series=[net_month.get(k, 0) for k in c.PROMO],
+         help="Net profit of all promo codes vs normal days, after extra waste and side effects, a month."),
+    dict(label="Saving if Kill rows stop", value=c.thb(kill["kill_saving"].sum()),
+         delta=f"{len(kill)} of {len(dec)} rows", delta_color="off", delta_arrow="off",
+         help="Profit a month we get back by stopping the promo rows marked Kill (at the new prices)."),
+    dict(label="Upside if tests pass", value=c.sthb(modify["modify_net"].sum()),
+         delta=f"range {c.thb(modify['modify_low'].sum())} to {c.thb(modify['modify_high'].sum())}",
+         delta_color="off", delta_arrow="off",
+         help="Profit a month if the changed promos (Modify + test) work as measured. 0 until a test passes."),
+    dict(label="Extra promo-day waste a month", value=c.thb(-codes["waste"].sum() / months),
+         delta=f"{more.min():.0f}-{more.max():.0f}% more cups wasted", delta_color="off", delta_arrow="off",
+         help="Waste cost on promo days above comparable normal days, all codes, a month."),
+])
+
+# ---- lift and net ----
+cp = summ[summ["level"] == "code_platform"].groupby("base_code")[["cups", "cm_thb_if_full_price", "cm_thb_promo"]].sum()
+sk = (summ[summ["level"] == "code_platform_sku"].query("base_code == 'RC101'")
+      .groupby("sku")[["cm_thb_if_full_price", "cm_thb_promo"]].sum())
+need = {c.promo(code): (r["cm_thb_if_full_price"] / r["cm_thb_promo"] - 1) * 100 for code, r in cp.iterrows()}
+need |= {f"{c.promo('RC101')}: {c.short_item(s)}": (r["cm_thb_if_full_price"] / r["cm_thb_promo"] - 1) * 100
+         for s, r in sk.iterrows()}
+got = {c.promo(code): r["actual_lift_pct"] for code, r in codes.iterrows()}
+got |= {f"{c.promo('RC101')}: {c.short_item(r['sku'])}": r["actual_lift_pct"]
+        for _, r in inc[inc["level"] == "rc101_sku"].iterrows()}
+order = [c.promo(k) for k in ["RC102", "RC103", "RC101"]] + [f"{c.promo('RC101')}: {c.short_item(s)}" for s in c.ITEMS]
+labels = [k for k in order if k in need and k in got]
+short = [k for k in labels if got[k] < need[k]]
+rc102 = c.promo("RC102")
+
+left, right = st.columns(2)
+with left:
+    fig = go.Figure()
+    fig.add_bar(y=labels, x=[need[k] for k in labels], name="Lift needed to break even", marker_color=c.GREY,
+                orientation="h", hovertemplate="%{y}<br>needs %{x:+.0f}% cups<extra></extra>")
+    fig.add_bar(y=labels, x=[got[k] for k in labels], name="Lift measured vs normal days", marker_color=c.KEY,
+                orientation="h", hovertemplate="%{y}<br>sold %{x:+.0f}% cups<extra></extra>")
+    fig.update_xaxes(title="% more cups than on normal days", ticksuffix="%")
+    fig.update_yaxes(autorange="reversed")
+    ex = cp.loc["RC102"] if "RC102" in cp.index else None
+    with c.card(f"{len(short)} of {len(labels)} promo groups sell fewer extra cups than they need",
+                so_what=f"{c.join([k for k in labels if k not in short], 'no promo group')} sells enough extra cups to "
+                        "pay for its discount, even before waste. A promo can still bring new customers, but the data "
+                        "cannot measure that.",
+                how_to_read="**Break-even lift** = how many more cups a promo must sell just to earn the same profit "
+                            "as at full price: profit per cup at full price / profit per cup at the promo price - 1. "
+                            + (f"Example: {rc102} cuts profit from {c.baht(ex['cm_thb_if_full_price'] / ex['cups'])} "
+                               f"to {c.baht(ex['cm_thb_promo'] / ex['cups'])} a cup, so it needs "
+                               f"{c.spct(need[rc102], 0)} more cups. " if ex is not None else "")
+                            + "Grey = needed, blue = what it really sold vs the same hours on normal days."):
+        c.show(fig, height=380, legend=True)
+
+with right:
+    worst = net_month.idxmin()
+    x = [c.promo(k) for k in net_month.index]
+    fig = go.Figure(go.Bar(x=x, y=net_month, marker_color=c.colors(net_month.index, [worst], c.LOSS),
+                           text=[c.thb(v) for v in net_month], textposition="outside", cliponaxis=False,
+                           customdata=[c.thb(v) for v in net_month],
+                           hovertemplate="%{x}<br>%{customdata} a month<extra></extra>"))
+    fig.add_hline(y=0, line=dict(color=c.DARK, width=1))
+    lo = net_month.min() * 1.35
+    fig.update_yaxes(title="Net profit a month (฿)", range=[lo, 0], **c.money_ticks(lo, 0, 4))
+    with c.card(f"All {len(net_month)} codes lose money: {c.thb(net_month.sum())} a month; {c.promo(worst)} "
+                "loses the most",
+                so_what=f"stopping every code would add about {c.thb(-net_month.sum())} a month; the decision table "
+                        "keeps the versions that a small change could turn positive.",
+                how_to_read="Start from the profit the promo days earned. Take away what the same hours would have "
+                            "earned on a normal day at full price (the baseline cups). Add the extra waste on promo "
+                            "days and the side effects: other items sold more or less, and sales pulled from the "
+                            "next days. Below 0 = we would have earned more without the promo.",
+                method="**Baseline** = mean cups of normal hours with the same kitchen, item, platform, month, "
+                       "weekday and hour (month is in the key because the rainy-season code only runs in the rainy "
+                       "months). The range comes from a bootstrap over promo days. The one promo day in Songkran "
+                       "week is left out: every item sold far above baseline that day."):
+        c.show(fig, height=380)
+        ntbl = codes.reset_index()[["code", "cups", "baseline_cups", "actual_lift_pct", "inc", "waste", "spill", "pull",
+                                    "net"]]
+        ntbl["code"] = ntbl["code"].map(c.promo)
+        ntbl["net_month"] = ntbl["net"] / months
+        ntbl = ntbl.rename(columns={"baseline_cups": "Baseline cups", "actual_lift_pct": "Lift",
+                                    "inc": "Profit vs baseline", "waste": "Extra waste", "spill": "Other items",
+                                    "pull": "Pull-forward", "net": "Net (year)", "net_month": "Net a month"})
+        c.table(ntbl, cols=["code", "Lift", "Extra waste", "Net a month"],
+                count=["cups", "Baseline cups"], pcts=["Lift"], name="promo_net_by_code",
+                money=["Profit vs baseline", "Extra waste", "Other items", "Pull-forward", "Net (year)", "Net a month"])
+
+# ---- decisions ----
+with c.card(f"Kill {len(kill)} promo rows, change and test {len(modify)}, keep none",
+            so_what=f"Kill rows save {c.thb(kill['kill_saving'].sum())} a month. Modify rows add "
+                    f"{c.sthb(modify['modify_net'].sum())} a month only if their tests pass.",
+            method="**Kill** if the best change is still below 0. **Modify + test** if one change (smaller discount, "
+                   "quiet hours only, no berry) turns it positive. Tests run for a few weeks against a control. "
+                   "Limits: the double-day code has few days, and new customers from promos are not in the data."):
+    pick = c.choose("Decision", sorted(dec["decision"].unique()), key="pr_decision")
+    d = dec if pick == "All" else dec[dec["decision"] == pick]
+    dtbl = pd.DataFrame({
+        "Promo": [c.promo(code) + ("" if p == "All" else f" on {p}") for code, p in zip(d["code"], d["platform"])],
+        "Item": d["sku"].replace("All", "All items").to_numpy(),
+        "Decision": d["decision"].map(c.title_case).to_numpy(), "Change": d["change"].map(c.title_case).to_numpy(),
+        "฿ a month": [s if dd == "Kill" else m for dd, s, m in zip(d["decision"], d["kill_saving"], d["modify_net"])],
+        "Confidence": d["confidence"].to_numpy(),
+        "Promo days": d["promo_days"].to_numpy(), "Today a month": d["net_per_month_new_prices"].to_numpy(),
+        "Main risk": d["main_risk"].map(c.promo).to_numpy()})
+    c.table(dtbl, cols=["Promo", "Item", "Decision", "Change", "฿ a month", "Confidence"],
+            money=["฿ a month", "Today a month"], count=["Promo days"], highlight=d["decision"].eq("Kill"),
+            name="promo_decision", raw=dec)
+    st.caption("฿ a month = saving if a Kill row stops, or the gain if a Modify + test row passes its test, at the new "
+               "Watermelon and PassionFruit prices.")
+
+# ---- waste ----
 rate_gap = (pw[("waste_rate_pct", "True")] - pw[("waste_rate_pct", "False")]).abs().max()
+names = [c.short_item(s) for s in pw.index]
 fig = go.Figure()
-fig.add_bar(x=pw.index, y=pw[("wasted_per_kitchen_day", "False")], name="Normal day", marker_color=c.GREY,
+fig.add_bar(x=names, y=pw[("wasted_per_kitchen_day", "False")], name="Normal day", marker_color=c.GREY,
             hovertemplate="%{x}<br>normal day: %{y:.1f} cups wasted<extra></extra>")
-fig.add_bar(x=pw.index, y=pw[("wasted_per_kitchen_day", "True")], name="Promo day", marker_color=c.KEY,
+fig.add_bar(x=names, y=pw[("wasted_per_kitchen_day", "True")], name="Promo day", marker_color=c.KEY,
             hovertemplate="%{x}<br>promo day: %{y:.1f} cups wasted<extra></extra>")
 fig.update_yaxes(title="Cups wasted per kitchen a day")
-c.show(fig, f"Promo days waste {more.min():.0f}-{more.max():.0f}% more cups, but the waste rate moves less than "
+with c.card(f"Promo days waste {more.min():.0f}-{more.max():.0f}% more cups, but the waste rate moves less than "
             f"{rate_gap:.1f} points",
-       f"Cups wasted per kitchen a day on days with and without a promo for that item, {c.data_period()}",
-       height=400, legend=True)
-extra = codes["waste"]
-c.chart_note("kitchens already prep more on promo days, and they sell more too. Extra waste cost vs comparable "
-             "normal days: " + ", ".join(f"{k} {c.thb(-v)} a year" for k, v in extra.items())
-             + ". When a promo stops, prep must come down with it.")
-wtbl = pd.DataFrame({"Item": pw.index,
-                     "Waste rate, normal day": pw[("waste_rate_pct", "False")].to_numpy(),
-                     "Waste rate, promo day": pw[("waste_rate_pct", "True")].to_numpy(),
-                     "Cups wasted a day, normal": pw[("wasted_per_kitchen_day", "False")].to_numpy(),
-                     "Cups wasted a day, promo": pw[("wasted_per_kitchen_day", "True")].to_numpy()})
-c.table(wtbl, pcts=["Waste rate, normal day", "Waste rate, promo day"],
-        dec=["Cups wasted a day, normal", "Cups wasted a day, promo"])
-c.download(wtbl, "waste_on_promo_days")
+            so_what="kitchens already prep more on promo days, and they sell more too. Extra waste cost vs comparable "
+                    "normal days: " + ", ".join(f"{c.promo(k)} {c.thb(-v)} a year" for k, v in codes["waste"].items())
+                    + ". When a promo stops, prep must come down with it."):
+    c.show(fig, height=320, legend=True)
+    wtbl = pd.DataFrame({"Item": pw.index,
+                         "Waste rate, normal day": pw[("waste_rate_pct", "False")].to_numpy(),
+                         "Waste rate, promo day": pw[("waste_rate_pct", "True")].to_numpy(),
+                         "Cups wasted a day, normal": pw[("wasted_per_kitchen_day", "False")].to_numpy(),
+                         "Cups wasted a day, promo": pw[("wasted_per_kitchen_day", "True")].to_numpy()})
+    with st.expander("Full table"):
+        c.table(wtbl, pcts=["Waste rate, normal day", "Waste rate, promo day"],
+                dec=["Cups wasted a day, normal", "Cups wasted a day, promo"], name="waste_on_promo_days")
 
-c.method_box(
-    "- **Baseline** = mean cups of normal hours with the same kitchen, item, platform, month, weekday and hour. "
-    "Month is in the key because the rainy-season code only runs in the rainy months.\n"
-    "- **Net** = promo CM - baseline cups x CM at full price + extra waste + side effects (other items on bundle "
-    "days, sales pulled from the next days). The range comes from a bootstrap over promo days.\n"
-    "- The one promo day in Songkran week is left out: every item sold far above baseline that day, so it has no "
-    "fair baseline.\n"
-    "- **Rules:** Kill if the best change is still below 0; Modify + test if one change (smaller discount, quiet "
-    "hours only, no berry) turns it positive. Tests run for a few weeks against a control.\n"
-    "- **Limits:** the double-day code has few days, and new customers from promos are not in the data.")
+c.next_page(c.PNL)

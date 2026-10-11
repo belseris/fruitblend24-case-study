@@ -1,4 +1,4 @@
-"""App tests: every page and filter runs, home KPIs equal company_pnl.csv, and the app text follows the style rules."""
+"""App tests: every page and control runs, home KPIs equal company_pnl.csv, and the screen text follows the rules."""
 import re
 import sys
 from pathlib import Path
@@ -18,6 +18,8 @@ NB04 = {"gross_revenue": 31_146_932.57, "gross_profit": 7_636_312.43, "operating
 BANNED = ["let's", "dive into", "comprehensive", "robust", "leverage", "crucial", "it's worth noting",
           "in conclusion", "key takeaways", "this analysis provides"]
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿✅❌]")
+# Terms a page answer may not use before the page explains them.
+TERMS = re.compile(r"\b(CM|GP-C|CR|WAPE)\b|break-even", re.IGNORECASE)
 
 
 def open_app(page: str | None = None) -> AppTest:
@@ -30,6 +32,16 @@ def open_app(page: str | None = None) -> AppTest:
     return at
 
 
+def tables(at: AppTest) -> list[pd.DataFrame]:
+    """Every table and dataframe on the page, as frames."""
+    return [x.value for x in list(at.dataframe) + list(at.table)]
+
+
+def screen_text(at: AppTest) -> list[str]:
+    """Titles, markdown and captions on the page."""
+    return [x.value for x in list(at.title) + list(at.markdown) + list(at.caption)]
+
+
 def test_home_runs():
     at = open_app()
     assert not at.exception
@@ -39,17 +51,39 @@ def test_home_runs():
 
 
 @pytest.mark.parametrize("page", PAGES)
-def test_page_and_filters_run(page):
+def test_page_and_controls_run(page):
     at = open_app(page)
     assert not at.exception, page
     assert not at.warning, page
-    assert at.title[0].value == common.PAGES[page][1], "page title = the question it answers"
-    # Every filter: pick its last option and run again.
-    for i in range(len(at.selectbox)):
-        box = at.selectbox[i]
-        box.set_value(box.options[-1])
-        at.run()
-        assert not at.exception, f"{page}: filter {box.label} = {box.options[-1]}"
+    assert at.title[0].value == common.PAGES[page].question, "page title = the question it answers"
+    # Every control: pick its last option and run again.
+    for kind in ["selectbox", "pills", "segmented_control"]:
+        for i in range(len(getattr(at, kind))):
+            box = getattr(at, kind)[i]
+            last = box.options[-1] if kind == "selectbox" else box.proto.options[-1].content
+            box.set_value(last)
+            at.run()
+            assert not at.exception, f"{page}: {kind} {box.label} = {last}"
+
+
+@pytest.mark.parametrize("page", PAGES)
+def test_page_answer_is_short(page):
+    at = open_app(page)
+    answer = at.session_state["page_answer"].replace("**", "")
+    assert len(answer.split()) <= 35, f"{page}: {len(answer.split())} words"
+    assert len(re.findall(r"[.!?](\s|$)", answer)) <= 2, f"{page}: more than 2 sentences"
+    assert not TERMS.search(answer), f"{page}: term in the answer before it is explained"
+
+
+@pytest.mark.parametrize("page", [None] + PAGES)
+def test_no_snake_case_on_screen(page):
+    at = open_app(page)
+    for df in tables(at):
+        names = [str(x) for x in df.columns] + [str(x) for x in df.index.names if x]
+        assert not [n for n in names if "_" in n], f"{page}: {names}"
+    # Promo codes always carry their name: 'Bundle (RC101)', never a bare 'RC101'.
+    for text in screen_text(at):
+        assert not re.search(r"(?<!\()\bRC10[123]\b", text), f"{page}: bare promo code in '{text[:80]}'"
 
 
 def test_kpis_equal_company_pnl():
@@ -72,17 +106,24 @@ def test_kpis_equal_company_pnl():
 
 
 def test_reconcile_matches():
-    at = open_app("pages/1_Data_Quality.py")
+    at = open_app(common.DQ)
     check = {x.label: x.value for x in at.metric}["Reconcile check"]
     assert check == "Matches"
 
 
+def test_action_plan_kpis_equal_scenarios():
+    ss = pd.read_csv(common.OUT / "scenario_summary.csv")
+    three = ss.groupby("scenario")["operating_profit"].sum()
+    shown = {x.label: x.value for x in open_app(common.ACTION).metric}
+    assert shown == {s: common.thb(v) for s, v in three.items()}
+
+
 def test_decision_search_filters():
-    at = open_app("pages/6_Assumptions_and_Method.py")
+    at = open_app(common.METHOD)
     total = len(common.decisions())
     at.text_input(key="am_search").set_value("berry").run()
     assert not at.exception
-    n = int(at.caption[0].value.split(" of ")[0])
+    n = next(int(x.value.split(" of ")[0]) for x in at.caption if " decisions." in x.value)
     assert 0 < n < total
 
 
@@ -93,6 +134,9 @@ def test_money_format():
     assert common.thb(7_620) == "฿7.6k"
     assert common.thb(-0.2) == "฿0"
     assert common.pct(24.517) == "24.5%"
+    assert common.pts(1.234) == "+1.2 pts"
+    assert common.promo("RC101 and Double day (RC102)") == "Bundle (RC101) and Double day (RC102)"
+    assert common.join([]) == "none" and common.span([]) == ""
 
 
 def test_app_text_style():
